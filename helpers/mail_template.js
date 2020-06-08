@@ -1,0 +1,19 @@
+class mail_template{
+    verify_mail(token, name){
+        var template=`<div>
+        Welcome to Gosiso ${name}<br/>
+        <a href="http://localhost:5001/user/verifyemail?token=${token}">Click</a> to approve account
+        <br/>
+        link expires after 3 day
+        </div>`
+        return template
+    }
+
+    onboard_mail(name){
+        var template=` <div>
+        <p>Hello ${name} this is an onboarding email</p>
+        </div>`
+        return template
+    }
+}
+module.exports=new mail_template()
