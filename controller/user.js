@@ -6,6 +6,7 @@ const mail=require("../helpers/mail");
 var Queue = require('bull');
 const REDIS_URL=process.env.REDIS_URL||'redis://127.0.0.1:6379'
 const WorkQueue = new Queue('email', REDIS_URL);
+const cloud=require('../helpers/cloud')
 
 class user{
     createAcc(req, res){
@@ -230,6 +231,28 @@ class user{
                                     }
                                 })
                             }
+                        })
+                    })
+                }catch(e){
+                    console.log(e)
+                    res.status(500)
+                }
+            }
+            
+
+            updatePics(req, res){
+                var data={
+                    pics:req.files[0].path
+                }
+                try{
+                    auth_user.verifyToken(req.token).then(user=>{
+                        cloud.pics_upload(data.pics).then(pics_url=>{
+                            data.pics=pics_url.secure_url
+                           
+                            userModel.findByIdAndUpdate(user._id, data, (err)=>{
+                                if(err) res.status(203).json({success:false, message:"error updating profile pics"})
+                                res.status(200).json({success:true, message:"pics updated successfully", pics:pics_url.secure_url})
+                            })
                         })
                     })
                 }catch(e){
