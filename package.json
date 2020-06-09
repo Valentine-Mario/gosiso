@@ -6,7 +6,6 @@
     "start": "nodemon ./bin/www"
   },
   "dependencies": {
-    "@handlebars/allow-prototype-access": "^1.0.3",
     "bcryptjs": "^2.4.3",
     "bull": "^3.14.0",
     "cloudinary": "^1.21.0",
@@ -15,9 +14,7 @@
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
     "express": "~4.16.1",
-    "express-handlebars": "^4.0.4",
     "express-timeout-handler": "^2.2.0",
-    "handlebars": "^4.7.6",
     "hbs": "~4.0.4",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^8.5.1",

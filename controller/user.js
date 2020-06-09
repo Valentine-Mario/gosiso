@@ -7,6 +7,7 @@ var Queue = require('bull');
 const REDIS_URL=process.env.REDIS_URL||'redis://127.0.0.1:6379'
 const WorkQueue = new Queue('email', REDIS_URL);
 const cloud=require('../helpers/cloud')
+const notification=require('./notification')
 
 class user{
     createAcc(req, res){
@@ -32,6 +33,7 @@ class user{
                                       res.status(203).json({success:false, message:err})
                                   }
                                }else{
+                                notification.welcomeNotification(newUser);
                                 let user=newUser._id
                                 WorkQueue.add({email:data.email}, { attempts: 5});
                                 auth_user.mailerToken({user}).then(token=>{
