@@ -8,6 +8,8 @@ require('dotenv').config()
 var timeout = require('express-timeout-handler');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var courierRouter=require('./routes/courier');
+var adminRouter=require('./routes/admin')
 
 var app = express();
 app.use(logger('dev'));
@@ -44,8 +46,8 @@ var options = {
 
 app.use('/', indexRouter);
 app.use('/user', usersRouter);
-
-
+app.use('/courier', courierRouter);
+app.use('/admin', adminRouter);
  
 app.use(timeout.handler(options));
 

@@ -1,6 +1,7 @@
 require('dotenv').config()
 const jwt=require('jsonwebtoken')
 const usrModel=require('../models/user')
+const adminModel=require('../models/admin')
 
 class auth{
     createToken(data){
@@ -21,6 +22,30 @@ class auth{
                     usrModel.findById(decoded_token.user, (err, user)=>{
                         if(err)rej(err)
                         res(user)
+                    })
+                }
+            })
+        })
+    }
+
+    createTokenAdmin(data){
+        return new Promise((res, rej)=>{
+            jwt.sign(data, process.env.JWT_SECRET, {expiresIn:'24h'}, (err, token_value)=>{
+                if(err)rej(err)
+                res(token_value);
+            })
+        })
+    }
+
+    verifyTokenAdmin(data){
+        return new Promise((res, rej)=>{
+            jwt.verify(data, process.env.JWT_SECRET, (err, decoded_token)=>{
+                if(err){
+                    rej(err)
+                }else{
+                    adminModel.findById(decoded_token.user, (err, admin)=>{
+                        if(err)rej(err)
+                        res(admin)
                     })
                 }
             })
