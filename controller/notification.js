@@ -14,7 +14,7 @@ class notification{
                 //do nothing
             })
         }catch(e){
-            res.status(500);
+           
             console.log(e)
         }
     }

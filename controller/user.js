@@ -6,8 +6,9 @@ const mail=require("../helpers/mail");
 var Queue = require('bull');
 const REDIS_URL=process.env.REDIS_URL||'redis://127.0.0.1:6379'
 const WorkQueue = new Queue('email', REDIS_URL);
-const cloud=require('../helpers/cloud')
-const notification=require('./notification')
+const cloud=require('../helpers/cloud');
+const notification=require('./notification');
+const balance=require('./balance');
 
 class user{
     createAcc(req, res){
@@ -33,21 +34,28 @@ class user{
                                       res.status(203).json({success:false, message:err})
                                   }
                                }else{
+                                   //create notification
                                 notification.welcomeNotification(newUser);
-                                let user=newUser._id
-                                WorkQueue.add({email:data.email}, { attempts: 5});
-                                auth_user.mailerToken({user}).then(token=>{
-                                    WorkQueue.process( job => {
-                                        //queue mailing job
-                                       mail.signup(job.data.email, "Welcome To Gosiso", newUser.firstName, token);
-                                       mail.onboard(job.data.email, "Onboarding", newUser.firstName)
-                                      })
-                                      WorkQueue.on('completed', (job, result) => {
-                                        console.log(`Job completed with result`);
-                                      })
-                                })
-                                auth_user.createToken({user}).then(login_token=>{
-                                    res.status(200).json({success:true, message:login_token});
+                                //create account balance
+                                balance.createAccount(newUser).then(acc=>{
+                                    let user=newUser._id
+                                    //queue job for email
+                                    WorkQueue.add({email:data.email}, { attempts: 5});
+                                    //create mail token
+                                    auth_user.mailerToken({user}).then(token=>{
+                                        WorkQueue.process( job => {
+                                            //queue mailing job
+                                           mail.signup(job.data.email, "Welcome To Gosiso", newUser.firstName, token);
+                                           mail.onboard(job.data.email, "Onboarding", newUser.firstName)
+                                          })
+                                          WorkQueue.on('completed', (job, result) => {
+                                            console.log(`Job completed with result`);
+                                          })
+                                    })
+                                    //create login token
+                                    auth_user.createToken({user}).then(login_token=>{
+                                        res.status(200).json({success:true, message:login_token});
+                                    })
                                 })
                                }
                         })
@@ -144,7 +152,9 @@ class user{
             getProfile(req, res){
                 try{
                     auth_user.verifyToken(req.token).then(user=>{
-                        res.status(200).json({success:true, message:user})
+                        balance.getBalance(user).then(balance=>{
+                            res.status(200).json({success:true, message:user, balance:balance})
+                        })
                     })
                 }catch(e){
                     console.log(e);
