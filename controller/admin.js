@@ -174,5 +174,113 @@ class admin{
             console.log(e)
         }
     }
+
+    editAddress(req, res){
+        var data={
+            verified_address:req.body.verified_address
+        }
+        var id={_id:req.params.id}
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    courierModel.findByIdAndUpdate(id, data, (err)=>{
+                        if(err)res.status(203).json({success:false, message:"error editing information", err:err})
+                        res.status(200).json({success:true, message:"address modified successfully"})
+                    })
+                }
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    editLocationPics(req, res){
+        var data={
+            locationImage:req.files[0].path
+        }
+        var id={_id:req.params.id}
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    cloud.pics_upload(data.locationImage).then(location_pics=>{
+                        data.locationImage=location_pics.secure_url;
+                        courierModel.findByIdAndUpdate(id, data, (err)=>{
+                            if(err)res.status(203).json({success:false, message:"error editing pics", err:err})
+                            res.status(200).json({success:true, message:"image updated successfully"})
+                        })
+                    })
+                }
+            })
+        }catch(e){
+            res.status(500);
+            console.log(e)
+        }
+    }
+
+    removeWarehousePics(req, res){
+        var id={_id:req.params.id}
+        var data={
+            wareHouseImage:req.body.wareHouseImage
+        }
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    courierModel.findById(id, (err, courier_details)=>{
+                        if(courier_details.wareHouseImage.includes(data.wareHouseImage)){
+                            courier_details.wareHouseImage.splice(courier_details.wareHouseImage.indexOf(data.wareHouseImage), 1)
+                            courier_details.save()
+                            res.status(200).json({status:true, message:"image successfully removed"})
+                            }else{
+                                res.status(201).json({status:false, message:"image not found"})
+                            }
+                    })
+                }
+            })
+        }catch(e){
+            res.status(500);
+            console.log(e)
+        }
+    }
+
+    addWarehousePics(req, res){
+        var data={
+            wareHouseImage:req.files
+        }
+        var id={_id:req.params.id}
+        var img=[]
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                        var count=data.wareHouseImage.length
+                        for(var i=0; i< data.wareHouseImage.length; i++){
+                            cloud.pics_upload(data.wareHouseImage[i].path).then(val=>{
+                                img.push(val.secure_url);
+                                
+                                if(count==img.length){
+                                    data.wareHouseImage=img;
+                                    courierModel.findByIdAndUpdate(id, data, (err)=>{
+                                        if(err)res.status(203).json({success:false, message:"error uploading pics", err:err})
+                                        res.status(200).json({success:true, message:"upload successful"})
+                                    })
+
+                                    }
+                                })
+                            }
+                }
+            })
+        }catch(e){
+            res.status(500);
+            console.log(e)
+        }
+    }
 }
 module.exports=new admin()

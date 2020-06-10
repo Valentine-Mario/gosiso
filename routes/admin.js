@@ -19,5 +19,9 @@ router.post('/login', admin.adminLogin)
 router.post('/getcouriers', verification.verifyToken, admin.getCouriers);
 router.get('/declinecourier/:id', verification.verifyToken, admin.declineCourier)
 router.post('/approvecourier/:id', upload.any(), verification.verifyToken, admin.acceptCourier)
+router.post('/editaddress/:id', verification.verifyToken, admin.editAddress)
+router.post('/editlocationpics/:id', upload.any(), verification.verifyToken, admin.editLocationPics)
+router.post('/removewarehousepics/:id', verification.verifyToken, admin.removeWarehousePics)
+router.post('/uploadwarehousepics/:id', upload.any(), verification.verifyToken, admin.addWarehousePics)
 
 module.exports = router;
