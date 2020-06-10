@@ -8,7 +8,7 @@ const mail=require("../helpers/mail");
 var Queue = require('bull');
 const REDIS_URL=process.env.REDIS_URL||'redis://127.0.0.1:6379'
 const WorkQueue = new Queue('email', REDIS_URL);
-
+const userModel=require('../models/user')
 
 class admin{
 
@@ -296,6 +296,52 @@ class admin{
             res.status(500);
             console.log(e)
         }
+    }
+
+    searchCourier(req, res){
+        var value= req.params.value;
+
+        var {page, limit}= req.query;
+            var options={
+                page:parseInt(page, 10) || 1,
+                limit:parseInt(limit, 10) || 10,
+                sort:{'_id':-1},
+                populate:'user'
+            }
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    courierModel.paginate({$or:[{"state":{$regex: value, $options: 'gi'}},{"city":{$regex: value, $options: 'gi'}}]}, options, (err, couriers)=>{
+                        if(err)res.status(203).json({success:false, message:"error searching courier", err:err})
+                        res.status(200).json({success:true, message:couriers})
+                    })
+                }
+            })
+           
+        }catch(e){
+            res.status(500);
+            console.log(e)
+        }
+    }
+
+    getAllUsers(req, res){
+        var {page, limit}= req.query;
+            var options={
+                page:parseInt(page, 10) || 1,
+                limit:parseInt(limit, 10) || 10,
+                sort:{'_id':-1},
+            }
+            try{
+                userModel.paginate({}, options, (err, users)=>{
+                    if(err)res.status(203).json({success:false, message:"error retriving users", err:err})
+                    res.status(200).json({success:true, message:users})
+                })
+            }catch(e){
+                res.status(500);
+                console.log(e)
+            }
     }
 }
 module.exports=new admin()

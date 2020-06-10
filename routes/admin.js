@@ -23,5 +23,7 @@ router.post('/editaddress/:id', verification.verifyToken, admin.editAddress)
 router.post('/editlocationpics/:id', upload.any(), verification.verifyToken, admin.editLocationPics)
 router.post('/removewarehousepics/:id', verification.verifyToken, admin.removeWarehousePics)
 router.post('/uploadwarehousepics/:id', upload.any(), verification.verifyToken, admin.addWarehousePics)
+router.get('/searchcourier/:id', verification.verifyToken, admin.searchCourier)
+router.get('/getusers', verification.verifyToken, admin.getAllUsers)
 
 module.exports = router;

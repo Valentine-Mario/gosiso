@@ -22,5 +22,6 @@ router.post('/editdetails', verification.verifyToken, userController.editDetails
 router.post('/modifypassword', verification.verifyToken, userController.updatePassword)
 router.get('/deleteaccount', verification.verifyToken, userController.deleteAccount)
 router.post('/updatepics', upload.any(), verification.verifyToken, userController.updatePics)
+router.post('/forgotpassword', userController.forgotPassword);
 
 module.exports = router;

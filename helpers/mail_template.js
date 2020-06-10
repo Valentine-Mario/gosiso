@@ -22,5 +22,12 @@ class mail_template{
         </div>`
         return template
     }
+
+    forgotEmail(password){
+        var template=`<div>
+             your new password is ${password}
+        </div>`
+        return template
+    }
 }
 module.exports=new mail_template()
