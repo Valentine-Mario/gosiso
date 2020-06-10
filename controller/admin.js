@@ -2,7 +2,8 @@ const auth_user=require('../helpers/auth');
 const hasher=require("../helpers/hasher");
 const courierModel=require('../models/courier');
 const adminModel=require('../models/admin')
-
+const notificationModel=require('./notification');
+const cloud=require('../helpers/cloud');
 class admin{
 
     makeAdmin(req, res){
@@ -93,6 +94,83 @@ class admin{
             })
         }catch(e){
             res.status(500);
+            console.log(e)
+        }
+    }
+
+    declineCourier(req, res){
+        var data={
+            pendingApproval:false,
+            verifiedCourier:false
+        }
+        var id={_id:req.params.id}
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    courierModel.findById(id, (err, courier)=>{
+                        courierModel.findByIdAndUpdate(id, data, (err)=>{
+                            if(err){
+                                res.status(203).json({success:false, message:"error declining application.", err:err})
+                            }else{
+                                notificationModel.declineNotification(courier.user);
+                                res.status(200).json({success:true, message:"declined successful"})
+                            }
+                        })
+                    }).populate('user')
+                }
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    acceptCourier(req, res){
+        var data={
+            wareHouseImage:req.files,
+            locationImage:req.files[0].path,
+            verified_address:req.body.verified_address,
+            pendingApproval:false,
+            verifiedCourier:true
+        }
+        var id={_id:req.params.id}
+        var img=[]
+
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    courierModel.findById(id, (err, courier)=>{
+                        var count=data.wareHouseImage.length
+                        for(var i=0; i< data.wareHouseImage.length; i++){
+                            cloud.pics_upload(data.wareHouseImage[i].path).then(val=>{
+                                img.push(val.secure_url);
+                                
+                                if(count==img.length){
+                                    data.wareHouseImage=img;
+                                    cloud.pics_upload(data.locationImage).then(location_img=>{
+                                        data.locationImage=location_img.secure_url;
+                                        courierModel.findByIdAndUpdate(id, data, (err)=>{
+                                            if(err){
+                                                res.status(203).json({success:false, message:"error approving application", err:err})
+                                            }else{
+                                                notificationModel.approveNotification(courier.user);
+                                                res.status(200).json({success:true, message:"application approved successfully"})
+                                            }
+                                        })
+                                    })
+                                }
+                            })
+                        }
+
+                    }).populate('user')
+                }
+            })
+        }catch(e){
+            res.status(500)
             console.log(e)
         }
     }

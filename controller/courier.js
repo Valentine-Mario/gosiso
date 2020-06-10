@@ -27,18 +27,24 @@ class Courier{
                 if(user_details.verified){
                     courierModel.findOne({$and:[{user:user_details._id}, {pendingApproval:true}]}, (err, pending_application)=>{
                         if(pending_application==null){
-                            data.user=user_details._id;
-                            courierModel.create(data, (err, courier_application)=>{
-                                if(err){
-                                    if (err.name === 'MongoError' && err.code === 11000) {
-                                        res.status(203).json({ success: false, message:"whatsapp phone number has already been taken"})
-                                      }else{
-                                          res.status(203).json({success:false, message:"error creating application", err:err})
-                                      }
-                                    }else{
-                                        res.status(200).json({success:true, message:"application sent"})
-                                    }
-    
+                            courierModel.findOne({$and:[{user:user_details._id}, {verifiedCourier:true}]}, (err, approved_courier)=>{
+                                if(approved_courier==null){
+                                    data.user=user_details._id;
+                                    courierModel.create(data, (err, courier_application)=>{
+                                        if(err){
+                                            if (err.name === 'MongoError' && err.code === 11000) {
+                                                res.status(203).json({ success: false, message:"whatsapp phone number has already been taken"})
+                                              }else{
+                                                  res.status(203).json({success:false, message:"error creating application", err:err})
+                                              }
+                                            }else{
+                                                res.status(200).json({success:true, message:"application sent"})
+                                            }
+            
+                                    })
+                                }else{
+                                    res.status(203).json({success:false, message:"you are already a verified courier"})
+                                }
                             })
                         }else{
                             res.status(203).json({success:false, message:"you have a pending application"})
@@ -49,7 +55,20 @@ class Courier{
                 }
             })
         }catch(e){
-            res.staus(200);
+            res.staus(500);
+            console.log(e)
+        }
+    }
+
+    getCourierById(req, res){
+        var id={_id:req.params.id}
+        try{
+            courierModel.findById(id, (err, courier)=>{
+                if(err)res.status(203).json({success:false, message:"error getting courier details"})
+                res.status(200).json({success:true, message:courier})
+            }).populate('user')
+        }catch(e){
+            res.status(500);
             console.log(e)
         }
     }

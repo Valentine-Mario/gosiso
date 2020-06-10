@@ -20,7 +20,7 @@ var schema=new mongoose.Schema({
     created_at:{type:Date},
     rate:{type:Number, default:0},
     wareHouseImage:[String],
-    locationImage:[String],
+    locationImage:{type:String},
     verified_address:{type:String}
 })
 schema.plugin(mongoosePaginate);
