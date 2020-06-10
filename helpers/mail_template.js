@@ -15,5 +15,12 @@ class mail_template{
         </div>`
         return template
     }
+
+    approveCourier(name){
+        var template=`<div>
+        <p>Congratulations ${name} your application as a courier has been approved
+        </div>`
+        return template
+    }
 }
 module.exports=new mail_template()

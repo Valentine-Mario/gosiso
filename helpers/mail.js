@@ -46,5 +46,22 @@ onboard(email, subject, user){
       }
     });
 }
+
+approvecourier(email, subject, user){
+  var mailTemplate  = template.approveCourier(user)
+  var mailOptions = {
+      from: '"Gosiso"',
+      to: email,
+      subject: subject,
+      html: `${mailTemplate}`
+    };
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error, false)
+      } else {
+          console.log(true)
+      }
+    });
+}
 }
 module.exports=new mailer()

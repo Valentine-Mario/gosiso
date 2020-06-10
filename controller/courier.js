@@ -72,6 +72,27 @@ class Courier{
             console.log(e)
         }
     }
+
+    searchCourier(req, res){
+        var value= req.params.value;
+
+        var {page, limit}= req.query;
+            var options={
+                page:parseInt(page, 10) || 1,
+                limit:parseInt(limit, 10) || 10,
+                sort:{'_id':-1},
+                populate:'user'
+            }
+        try{
+            courierModel.paginate({$and:[{"state":{$regex: value, $options: 'gi'}}, {pendingApproval:false}, {verifiedCourier:true}]}, options, (err, couriers)=>{
+                if(err)res.status(203).json({success:false, message:"error searching courier", err:err})
+                res.status(200).json({success:true, message:couriers})
+            })
+        }catch(e){
+            res.status(500);
+            console.log(e)
+        }
+    }
 }
 
 module.exports=new Courier()

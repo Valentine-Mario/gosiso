@@ -4,6 +4,12 @@ const courierModel=require('../models/courier');
 const adminModel=require('../models/admin')
 const notificationModel=require('./notification');
 const cloud=require('../helpers/cloud');
+const mail=require("../helpers/mail");
+var Queue = require('bull');
+const REDIS_URL=process.env.REDIS_URL||'redis://127.0.0.1:6379'
+const WorkQueue = new Queue('email', REDIS_URL);
+
+
 class admin{
 
     makeAdmin(req, res){
@@ -70,7 +76,7 @@ class admin{
         var {page, limit}= req.query;
             var options={
                 page:parseInt(page, 10) || 1,
-                limit:parseInt(limit, 10) || 15,
+                limit:parseInt(limit, 10) || 10,
                 sort:{'_id':-1},
                 populate:'user'
             }
@@ -144,6 +150,7 @@ class admin{
                     res.status(203).json({success:false, message:"unauthorized to access endpoint"})
                 }else{
                     courierModel.findById(id, (err, courier)=>{
+                        WorkQueue.add({email:courier.user.email}, { attempts: 5});
                         var count=data.wareHouseImage.length
                         for(var i=0; i< data.wareHouseImage.length; i++){
                             cloud.pics_upload(data.wareHouseImage[i].path).then(val=>{
@@ -158,6 +165,13 @@ class admin{
                                                 res.status(203).json({success:false, message:"error approving application", err:err})
                                             }else{
                                                 notificationModel.approveNotification(courier.user);
+                                                WorkQueue.process( job => {
+                                                    //queue mailing job
+                                                   mail.approvecourier(job.data.email, "Courier Approved", courier.user.firstName)
+                                                  })
+                                                  WorkQueue.on('completed', (job, result) => {
+                                                    console.log(`Job completed with result`);
+                                                  })
                                                 res.status(200).json({success:true, message:"application approved successfully"})
                                             }
                                         })
@@ -254,27 +268,28 @@ class admin{
             wareHouseImage:req.files
         }
         var id={_id:req.params.id}
-        var img=[]
+        var img_count=0
         try{
             auth_user.verifyTokenAdmin(req.token).then(admin=>{
                 if(admin==null){
                     res.status(203).json({success:false, message:"unauthorized to access endpoint"})
                 }else{
-                        var count=data.wareHouseImage.length
-                        for(var i=0; i< data.wareHouseImage.length; i++){
-                            cloud.pics_upload(data.wareHouseImage[i].path).then(val=>{
-                                img.push(val.secure_url);
-                                
-                                if(count==img.length){
-                                    data.wareHouseImage=img;
-                                    courierModel.findByIdAndUpdate(id, data, (err)=>{
-                                        if(err)res.status(203).json({success:false, message:"error uploading pics", err:err})
+                        courierModel.findById(id, (err, courier_details)=>{
+                            for(var i=0; i< data.wareHouseImage.length; i++){
+                                cloud.pics_upload(data.wareHouseImage[i].path).then(val=>{
+                                    img_count++
+                                    courier_details.wareHouseImage.push(val.secure_url)
+                                    
+                                    //track for successful upload then terminate function
+                                    if(img_count==data.wareHouseImage.length){
                                         res.status(200).json({success:true, message:"upload successful"})
-                                    })
-
+                                        courier_details.save()
                                     }
-                                })
-                            }
+                                    
+                                    })
+                                }
+                        })
+                        
                 }
             })
         }catch(e){
