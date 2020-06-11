@@ -50,5 +50,21 @@ class notification{
             console.log(e)
         }
     }
+
+    bankChangeNotification(user, message){
+        var data={
+            title:"Bank Update Status",
+            message:message,
+            user:user,
+            created_at:Date.now()
+        }
+        try{
+            notificationModel.create(data, (err, bankNotif)=>{
+                //do nothing
+            })
+        }catch(e){
+            console.log(e)
+        }
+    }
 }
 module.exports=new notification()

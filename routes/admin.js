@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const verification= require('../verification/verification');
 const admin=require('../controller/admin')
+const pending_banks=require('../controller/admin_bank')
 var multer = require('multer')
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -25,5 +26,11 @@ router.post('/removewarehousepics/:id', verification.verifyToken, admin.removeWa
 router.post('/uploadwarehousepics/:id', upload.any(), verification.verifyToken, admin.addWarehousePics)
 router.get('/searchcourier/:id', verification.verifyToken, admin.searchCourier)
 router.get('/getusers', verification.verifyToken, admin.getAllUsers)
+
+
+//bank stuff
+router.get('/getpendingbank', verification.verifyToken, pending_banks.getPendingBanks)
+router.get('/getpendingbankbyid/:id', verification.verifyToken, pending_banks.getPendingBankById)
+router.post('/changebankpendingstatus/:id', verification.verifyToken, pending_banks.changePendingStatus)
 
 module.exports = router;

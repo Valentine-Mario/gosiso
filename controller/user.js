@@ -277,7 +277,7 @@ class user{
                 var data={
                     email:req.body.email
                 }
-                var new_password=Math.random().toString(36).substring(2)
+                var new_password=Math.random().toString(36).substring(2);
 
                 try{
                     hasher.hash_password(new_password).then(pass_value=>{
