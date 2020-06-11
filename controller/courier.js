@@ -1,6 +1,6 @@
 const courierModel=require('../models/courier');
 const auth_user=require('../helpers/auth');
-
+const ratingModel=require('../models/ratings')
 
 class Courier{
 
@@ -87,6 +87,46 @@ class Courier{
             courierModel.paginate({$and:[{"state":{$regex: value, $options: 'gi'}}, {pendingApproval:false}, {verifiedCourier:true}]}, options, (err, couriers)=>{
                 if(err)res.status(203).json({success:false, message:"error searching courier", err:err})
                 res.status(200).json({success:true, message:couriers})
+            })
+        }catch(e){
+            res.status(500);
+            console.log(e)
+        }
+    }
+
+    rateCourier(req, res){
+        var id={_id:req.params.id}
+        var data={
+            rating:req.body.rating,
+            courier:''
+        }
+        try{
+            auth_user.verifyToken(req.token).then(user=>{
+                data.rating=parseInt(data.rating)
+                if(parseInt(data.rating)>= 1 && parseInt(data.rating)<=5){
+                    data.courier=id
+                    ratingModel.create(data, (err, rating)=>{
+                        if(err){
+                            res.status(203).json({success:false, message:"error adding rating"})
+                        }else{
+                            
+                            res.status(200).json({success:true, message:"rating sent successfully"})
+
+                            //calculate courier rating
+                            ratingModel.find({courier:id}, (err, allRatins)=>{
+                                let ratings_result = allRatins.map(a => a.rating);
+                                var sum=ratings_result.reduce(function(a,b){
+                                         return a+b
+                              }, 0)
+                                var mean=(parseInt(sum)/parseInt( ratings_result.length)).toFixed(2)
+                                courierModel.findByIdAndUpdate(id, {rate:mean}, (err)=>{})
+                            }) 
+                                 
+                        }
+                    })
+                }else{
+                    res.status(203).json({success:false, message:"invalid rating. should be between 1 and 5"})
+                }
             })
         }catch(e){
             res.status(500);

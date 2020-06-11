@@ -12,6 +12,8 @@ var courierRouter=require('./routes/courier');
 var adminRouter=require('./routes/admin')
 var bankRouter=require('./routes/banks')
 var notificationRouter=require('./routes/notification')
+var cardRouter=require('./routes/cards')
+
 
 var app = express();
 app.use(logger('dev'));
@@ -52,6 +54,7 @@ app.use('/courier', courierRouter);
 app.use('/admin', adminRouter);
 app.use('/bank', bankRouter) 
 app.use('/notif', notificationRouter)
+app.use('/card', cardRouter)
 
 app.use(timeout.handler(options));
 

@@ -6,5 +6,6 @@ const courierController=require('../controller/courier')
 router.post('/apply', verification.verifyToken, courierController.applyAsCourier)
 router.get('/get/:id', courierController.getCourierById)
 router.get('/search/:value', courierController.searchCourier)
+router.post('/rate/:id', verification.verifyToken, courierController.rateCourier)
 
 module.exports = router;

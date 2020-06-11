@@ -8,6 +8,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "bull": "^3.14.0",
+    "card-validator": "^6.2.0",
     "cloudinary": "^1.21.0",
     "cookie-parser": "~1.4.4",
     "cryptr": "^6.0.2",
