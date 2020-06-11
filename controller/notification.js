@@ -1,4 +1,5 @@
 const notificationModel=require('../models/notification')
+const auth_user=require('../helpers/auth');
 
 class notification{
 
@@ -63,6 +64,46 @@ class notification{
                 //do nothing
             })
         }catch(e){
+            console.log(e)
+        }
+    }
+
+    getUnreadNotificationLength(req, res){
+        try{
+            auth_user.verifyToken(req.token).then(user=>{
+                notificationModel.find({$and:[{user:user._id}, {viewed:false}]}, (err, unread)=>{
+                    if(err)res.status(203).json({success:false, message:"error getting length", err:err})
+                    res.status(200).json({success:true, message:unread.length})
+                })
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    getNotifications(req, res){
+        var {page, limit}= req.query;
+            var options={
+                page:parseInt(page, 10) || 1,
+                limit:parseInt(limit, 10) || 10,
+                sort:{'_id':-1},
+            }
+        try{
+            auth_user.verifyToken(req.token).then(user=>{
+                notificationModel.paginate({user:user._id}, options, (err, notif)=>{
+                    if(err){
+                        res.status(203).json({success:false, message:"error getting details"})
+                    }else{
+                        res.status(200).json({success:true, message:notif})
+                        notificationModel.updateMany({$and:[{user:user._id}, {viewed:false}]}, {"$set":{"viewed": true}}, (err)=>{
+                            
+                        })
+                    }
+                })
+            })
+        }catch(e){
+            res.status(500)
             console.log(e)
         }
     }
