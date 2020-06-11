@@ -10,6 +10,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var courierRouter=require('./routes/courier');
 var adminRouter=require('./routes/admin')
+var bankRouter=require('./routes/banks')
 
 var app = express();
 app.use(logger('dev'));
@@ -48,7 +49,8 @@ app.use('/', indexRouter);
 app.use('/user', usersRouter);
 app.use('/courier', courierRouter);
 app.use('/admin', adminRouter);
- 
+app.use('/bank', bankRouter) 
+
 app.use(timeout.handler(options));
 
 // catch 404 and forward to error handler
