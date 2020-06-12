@@ -26,7 +26,8 @@ router.post('/removewarehousepics/:id', verification.verifyToken, admin.removeWa
 router.post('/uploadwarehousepics/:id', upload.any(), verification.verifyToken, admin.addWarehousePics)
 router.get('/searchcourier/:id', verification.verifyToken, admin.searchCourier)
 router.get('/getusers', verification.verifyToken, admin.getAllUsers)
-
+router.get('/getuserid/:id', verification.verifyToken, admin.getUserById)
+router.get('/searchuser/:value', verification.verifyToken, admin.searchUser)
 
 //bank stuff
 router.get('/getpendingbank', verification.verifyToken, pending_banks.getPendingBanks)

@@ -6,7 +6,7 @@ var schema=new mongoose.Schema({
     state:{type:String, require:true},
     city:{type:String, required:true},
     home_address:{type:String, required:true},
-    whatsapp:{type:Number, required:true, unique:true},
+    whatsapp:{type:String, required:true, unique:true},
     facebook:{type:String},
     guarantor1_name:{type:String, required:true},
     guarantor1_number:{type:Number, required:true},

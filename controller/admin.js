@@ -9,7 +9,8 @@ var Queue = require('bull');
 const REDIS_URL=process.env.REDIS_URL||'redis://127.0.0.1:6379'
 const WorkQueue = new Queue('email', REDIS_URL);
 const userModel=require('../models/user')
-
+const balanceController=require('./balance')
+const BankModel=require('../models/bank_details')
 class admin{
 
     makeAdmin(req, res){
@@ -334,14 +335,71 @@ class admin{
                 sort:{'_id':-1},
             }
             try{
-                userModel.paginate({}, options, (err, users)=>{
-                    if(err)res.status(203).json({success:false, message:"error retriving users", err:err})
-                    res.status(200).json({success:true, message:users})
+                auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                    if(admin==null){
+                        res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                    }else{
+                        userModel.paginate({}, options, (err, users)=>{
+                            if(err)res.status(203).json({success:false, message:"error retriving users", err:err})
+                            res.status(200).json({success:true, message:users})
+                        })
+                     }
                 })
             }catch(e){
                 res.status(500);
                 console.log(e)
             }
+    }
+
+    getUserById(req, res){
+        var id={_id:req.params.id}
+
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    userModel.findById(id, (err, user)=>{
+                        balanceController.getBalance(user).then(balance=>{
+                            BankModel.findOne({user:user._id}, (err, bank_details)=>{
+                                if(err)res.ststua(203).json({success:false, message:"error getting users", err:err})
+                                res.status(200).json({success:true, user:user, balance:balance, bank:bank_details})
+                            })
+                        })
+                    })
+            }
+
+        })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    searchUser(req, res){
+        var {page, limit}= req.query;
+        var options={
+            page:parseInt(page, 10) || 1,
+            limit:parseInt(limit, 10) || 10,
+            sort:{'_id':-1},
+        }
+        var value= req.params.value;
+
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    userModel.paginate({$or:[{"firstName":{$regex: value, $options: 'gi'}}, {"lastName":{$regex: value, $options: 'gi'}}]}, options, (err, users=>{
+                        if(err)res.status(203).json({success:false, message:"error getting users", err:err})
+                        res.status(200).json({success:true, message:users})
+                    }))
+                }
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
     }
 }
 module.exports=new admin()

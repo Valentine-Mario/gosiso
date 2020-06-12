@@ -4,7 +4,7 @@ var schema=new mongoose.Schema({
     firstName:{type:String, required:true},
     lastName:{type:String, required:true},
     email:{type:String, unique:true, required:true},
-    phone:{type:Number, unique:true, required:true},
+    phone:{type:String, unique:true, required:true},
     password:{type:String, required:true},
     pics:{type:String, default:"https://res.cloudinary.com/school-fleep/image/upload/v1535357797/avatar-1577909_640.png"},
     verified:{type:Boolean, default:false},

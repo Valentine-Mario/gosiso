@@ -25,7 +25,7 @@ class Card{
                         }
                     })
                 }else{
-                    res.status(203).json({succes:false, message:"invalid card type"})
+                    res.status(203).json({success:false, message:"invalid card type"})
                 }
             })
         }catch(e){
@@ -43,7 +43,28 @@ class Card{
                         var decrypted_value= encrypt.decrypt(a.card_no)
                         cards.push({_id:a.id, card_no:decrypted_value, card_type:a.card_type })
                     }
-                    res.status(200).json({succes:true, message:cards})
+                    res.status(200).json({success:true, message:cards})
+                })
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    deleteCard(req, res){
+        var id={_id:req.params.id}
+        try{
+            auth_user.verifyToken(req.token).then(user=>{
+                cardModel.findById(id, (err, card_details)=>{
+                    if(JSON.stringify(user._id)==JSON.stringify(card_details.user)){
+                        cardModel.findByIdAndDelete(id, (err)=>{
+                            if(err)res.status(203).json({success:false, message:"error deleting card", err:err})
+                            res.status(200).json({success:true, message:"card deleted successfully"})
+                        })
+                    }else{
+                        res.status(203).json({success:false, message:"unauthorized to delete card"})
+                    }
                 })
             })
         }catch(e){
