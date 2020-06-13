@@ -68,12 +68,19 @@ class AdminPayment{
                                 }else{
                                     BalanceController.getBalance(withdrawal.user).then(balance=>{
                                         var new_balance=(balance.balance - withdrawal.amount).toFixed(2)
-
+                                        WorkQueue.add({email:withdrawal.user.email}, { attempts: 5});
                                         BalanceController.updateBalace(withdrawal.user, new_balance).then(success=>{
                                             if(success==true){
-                                                notificationModel.WithdrawalNotif("Withdrawal approved", "Your request for withdrawal has been approved", withdrawal.user)
                                                 res.status(200).json({success:true, message:"approval successful"})
                                                 BalanceHistory.createData(withdrawal.amount, withdrawal.user, "Withdrawal approved", "debit")
+                                                notificationModel.WithdrawalNotif("Withdrawal approved", "Your request for withdrawal has been approved", withdrawal.user)
+                                                WorkQueue.process( job => {
+                                                    //queue mailing job
+                                                   mail.approveWithdrawal(job.data.email)
+                                                  })
+                                                  WorkQueue.on('completed', (job, result) => {
+                                                    console.log(`Job completed with result`);
+                                                  })
                                             }
                                         })
                                     });

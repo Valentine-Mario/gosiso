@@ -84,5 +84,26 @@
                     });
                 })
       }
+
+      approveWithdrawal(email){
+        return new Promise((resolve, reject)=>{
+          var mailTemplate  = template.successWithdrawal()
+          var mailOptions = {
+              from: '"Gosiso"',
+              to: email,
+              subject: "Withdrawal approved",
+              html: `${mailTemplate}`
+            };
+            transporter.sendMail(mailOptions, function(error, info){
+              if (error) {
+                console.log(error, false)
+                reject(false)
+              } else {
+                  console.log(true)
+                  resolve(true)
+              }
+            });
+        })
+      }
       }
       module.exports=new mailer()

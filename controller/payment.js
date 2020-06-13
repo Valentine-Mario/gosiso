@@ -55,49 +55,50 @@ class Payment{
                             if(currennt_balance.balance<2000 || currennt_balance.balance<parseFloat(data.amount)){
                                 res.status(203).json({success:false, message:"insufficient balance to withdraw. Be sure to have at least 2000 naira in your balance to request withdrwal"})
                             }else{
-                                BankModel.findOne({user:user_details._id}, (err, bank)=>{
-                                    if(bank==null){
-                                        res.status(203).json({success:false, message:"Add a bank before you seek withdrawal"})
-                                    }else{
-                                        CourierModel.findOne({$and:[{user:user_details._id}, {verifiedCourier:true}]}, (err, courier)=>{
-                                            if(courier==null){
-                                                data.user=user_details._id;
-                                                data.bank=bank._id
-                                                var new_balance=(currennt_balance.balance - data.amount).toFixed(2)
-                                               
-                                                
-                                                        withdrawModel.create(data, (err, withdrawal_details)=>{
-                                                            if(err)res.status(203).json({success:false, message:"error sending request", err:err})
-                                                            res.status(200).json({success:true, message:"withdrawal request sent successfully"})
-                                                        })
-                                                    
-                                               
+                                withdrawModel.findOne({$and:[{user:user_details._id}, {pending:true}]}, (err, pending_withdrawal)=>{
+                                    if(pending_withdrawal==null){
+                                        BankModel.findOne({user:user_details._id}, (err, bank)=>{
+                                            if(bank==null){
+                                                res.status(203).json({success:false, message:"Add a bank before you seek withdrawal"})
                                             }else{
-                                                //get earnings from waybill
-                                                BalanceController.getBalanceFromWaybill(user_details).then(waybill_balance=>{
-                                                    if(waybill_balance<2000){
-                                                        res.status(203).json({success:false, message:"total earning from waybill has to be over 2000 naira"})
-                                                    }else{
+                                                CourierModel.findOne({$and:[{user:user_details._id}, {verifiedCourier:true}]}, (err, courier)=>{
+                                                    if(courier==null){
                                                         data.user=user_details._id;
                                                         data.bank=bank._id
-                                                var new_balance=(currennt_balance.balance - data.amount).toFixed(2)
-                                                
-                                                        withdrawModel.create(data, (err, withdrawal_details)=>{
-                                                            if(err)res.status(203).json({success:false, message:"error sending request", err:err})
-                                                            res.status(200).json({success:true, message:"withdrawal request sent successfully"})
+                                                                withdrawModel.create(data, (err, withdrawal_details)=>{
+                                                                    if(err)res.status(203).json({success:false, message:"error sending request", err:err})
+                                                                    res.status(200).json({success:true, message:"withdrawal request sent successfully"})
+                                                                })
+                                                       
+                                                    }else{
+                                                        //get earnings from waybill
+                                                        BalanceController.getBalanceFromWaybill(user_details).then(waybill_balance=>{
+                                                            if(waybill_balance<2000){
+                                                                res.status(203).json({success:false, message:"total earning from waybill has to be over 2000 naira"})
+                                                            }else{
+                                                                data.user=user_details._id;
+                                                                data.bank=bank._id
+                                                        
+                                                                withdrawModel.create(data, (err, withdrawal_details)=>{
+                                                                    if(err)res.status(203).json({success:false, message:"error sending request", err:err})
+                                                                    res.status(200).json({success:true, message:"withdrawal request sent successfully"})
+                                                                })
+                                                          
+                                                            }
                                                         })
-                                                  
                                                     }
                                                 })
                                             }
                                         })
+                                    }else{
+                                        res.status(203).json({success:false, message:"you have a pending withdrawal request. You can't resend until previous one is resolved"})
                                     }
                                 })
                                 
                             }
                         })
                     }else{
-                        res.status(203).json({success:false, message:"invaqlid password"})
+                        res.status(203).json({success:false, message:"invalid password"})
                     }
                 })
             })

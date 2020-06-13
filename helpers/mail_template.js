@@ -29,5 +29,12 @@ class mail_template{
         </div>`
         return template
     }
+
+    successWithdrawal(){
+        var template=`<div>
+        your withdwal request was approved
+        </div>`
+        return template
+    }
 }
 module.exports=new mail_template()
