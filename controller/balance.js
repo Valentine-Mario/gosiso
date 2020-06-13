@@ -1,4 +1,5 @@
 const BalanceModel=require('../models/balance');
+const historyModel=require('../models/balance_history')
 
 class Balance{
 
@@ -43,6 +44,26 @@ class Balance{
                         reject(err)
                     }else{
                         resolve(true)
+                    }
+                })
+            })
+        }catch(e){
+            console.log(e)
+        }
+    }
+
+    getBalanceFromWaybill(user){
+        try{
+            return new Promise((resolve, reject)=>{
+                historyModel.find({$and:[{user:user._id}, {description:"earning from waybill"}]}, (err, history)=>{
+                    if(err){
+                        reject(err)
+                    }else{
+                        let earnings = history.map(a => a.amount);
+                        var sum=earnings.reduce(function(a,b){
+                                 return a+b
+                      }, 0)
+                      resolve(sum)
                     }
                 })
             })

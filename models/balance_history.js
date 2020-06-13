@@ -4,8 +4,8 @@ var schema= new mongoose.Schema({
    amount:{type: Number, required: true},
    user:{type:mongoose.Schema.Types.ObjectId, ref:'user'},
    date:Date,
-   pending:{type:Boolean, default:true},
-   approved:{type:Boolean, default:false}
+   description:{type:String, required:true},
+   request_type:{type:String}
 })
 schema.plugin(mongoosePaginate);
-module.exports= mongoose.model('withdraw', schema);
+module.exports= mongoose.model('balance_history', schema);
