@@ -107,5 +107,22 @@ class notification{
             console.log(e)
         }
     }
+
+    WithdrawalNotif(title, message, user){
+        var data={
+            title:title,
+            message:message,
+            user:user._id,
+            created_at:Date.now()
+        }
+        try{
+            notificationModel.create(data, (err, welcomeNotif)=>{
+                //do nothing
+            })
+        }catch(e){
+           
+            console.log(e)
+        }
+    }
 }
 module.exports=new notification()

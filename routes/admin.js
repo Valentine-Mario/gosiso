@@ -3,6 +3,7 @@ var router = express.Router();
 const verification= require('../verification/verification');
 const admin=require('../controller/admin')
 const pending_banks=require('../controller/admin_bank')
+const withdrawal_request=require('../controller/admin_payment')
 var multer = require('multer')
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -34,4 +35,7 @@ router.get('/getpendingbank', verification.verifyToken, pending_banks.getPending
 router.get('/getpendingbankbyid/:id', verification.verifyToken, pending_banks.getPendingBankById)
 router.post('/changebankpendingstatus/:id', verification.verifyToken, pending_banks.changePendingStatus)
 
+//withdrawal stuffs
+router.post('/viewwithdrawalrequest', verification.verifyToken, withdrawal_request.getPendingWithdrawal)
+router.post('/withdrawalreview/:id', verification.verifyToken, withdrawal_request.reviewRequest)
 module.exports = router;

@@ -5,6 +5,7 @@ const hasher=require('../helpers/hasher')
 const withdrawModel=require('../models/withdrawal_request')
 const BalanceHistory=require('./balace_history')
 const CourierModel=require("../models/courier")
+const BankModel=require('../models/bank_details')
 
 class Payment{
     addPayment(req, res){
@@ -43,7 +44,8 @@ class Payment{
             amount:req.body.amount,
             user:'',
             date:Date.now(),
-            password:req.body.password
+            password:req.body.password,
+            bank:''
         }
         try{
             auth_user.verifyToken(req.token).then(user_details=>{
@@ -53,38 +55,40 @@ class Payment{
                             if(currennt_balance.balance<2000 || currennt_balance.balance<parseFloat(data.amount)){
                                 res.status(203).json({success:false, message:"insufficient balance to withdraw. Be sure to have at least 2000 naira in your balance to request withdrwal"})
                             }else{
-                                CourierModel.findOne({$and:[{user:user_details._id}, {verifiedCourier:true}]}, (err, courier)=>{
-                                    if(courier==null){
-                                        data.user=user_details._id;
-                                        var new_balance=(currennt_balance.balance - data.amount).toFixed(2)
-                                        BalanceController.updateBalace(user_details, new_balance).then(success=>{
-                                            if(success==true){
-                                                withdrawModel.create(data, (err, withdrawal_details)=>{
-                                                    if(err)res.status(203).json({success:false, message:"error sending request", err:err})
-                                                    res.status(200).json({success:true, message:"withdrawal request sent successfully"})
-                                                })
-                                            }
-                                        }).catch(err=>{
-                                            res.status(203).json({success:false, message:"error updating balance", err:err})
-                                        })
+                                BankModel.findOne({user:user_details._id}, (err, bank)=>{
+                                    if(bank==null){
+                                        res.status(203).json({success:false, message:"Add a bank before you seek withdrawal"})
                                     }else{
-                                        //get earnings from waybill
-                                        BalanceController.getBalanceFromWaybill(user_details).then(waybill_balance=>{
-                                            if(waybill_balance<2000){
-                                                res.status(203).json({success:false, message:"total earning from waybill has to be over 2000 naira"})
-                                            }else{
+                                        CourierModel.findOne({$and:[{user:user_details._id}, {verifiedCourier:true}]}, (err, courier)=>{
+                                            if(courier==null){
                                                 data.user=user_details._id;
-                                        var new_balance=(currennt_balance.balance - data.amount).toFixed(2)
-                                        BalanceController.updateBalace(user_details, new_balance).then(success=>{
-                                            if(success==true){
-                                                withdrawModel.create(data, (err, withdrawal_details)=>{
-                                                    if(err)res.status(203).json({success:false, message:"error sending request", err:err})
-                                                    res.status(200).json({success:true, message:"withdrawal request sent successfully"})
+                                                data.bank=bank._id
+                                                var new_balance=(currennt_balance.balance - data.amount).toFixed(2)
+                                               
+                                                
+                                                        withdrawModel.create(data, (err, withdrawal_details)=>{
+                                                            if(err)res.status(203).json({success:false, message:"error sending request", err:err})
+                                                            res.status(200).json({success:true, message:"withdrawal request sent successfully"})
+                                                        })
+                                                    
+                                               
+                                            }else{
+                                                //get earnings from waybill
+                                                BalanceController.getBalanceFromWaybill(user_details).then(waybill_balance=>{
+                                                    if(waybill_balance<2000){
+                                                        res.status(203).json({success:false, message:"total earning from waybill has to be over 2000 naira"})
+                                                    }else{
+                                                        data.user=user_details._id;
+                                                        data.bank=bank._id
+                                                var new_balance=(currennt_balance.balance - data.amount).toFixed(2)
+                                                
+                                                        withdrawModel.create(data, (err, withdrawal_details)=>{
+                                                            if(err)res.status(203).json({success:false, message:"error sending request", err:err})
+                                                            res.status(200).json({success:true, message:"withdrawal request sent successfully"})
+                                                        })
+                                                  
+                                                    }
                                                 })
-                                            }
-                                        }).catch(err=>{
-                                            res.status(203).json({success:false, message:"error updating balance", err:err})
-                                        })
                                             }
                                         })
                                     }
