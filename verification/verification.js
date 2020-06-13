@@ -9,10 +9,10 @@ exports.verifyToken= (req, res, next)=>{
         auth.verifyToken(token).then((decoded_value)=>{
             next()
         }).catch(err=>{
-            res.status(205).json({message:err.message})
+            res.status(205).json({success:false, message:err.message})
         })
     }else{
-        res.status(205).json({ message:"please provide a token"})
+        res.status(205).json({success:false, message:"please provide a token"})
         }
 }
 
@@ -22,9 +22,9 @@ exports.verifyMail=(req, res, next)=>{
         auth.verifyToken(token).then(decoded =>{
             next();
         }).catch(err=>{
-            res.status(205).json({message:err.message})
+            res.status(205).json({success:false, message:err.message})
         });
     } else{
-        res.status(205).json({err: "No token provided" });
+        res.status(205).json({success:false, message: "No token provided" });
     }
 }

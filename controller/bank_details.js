@@ -14,27 +14,31 @@ class Bank{
         }
         try{
             auth_user.verifyToken(req.token).then(user=>{
-                hasher.compare_password(data.password, user.password).then(value=>{   
-                    if(value){
-                        data.user=user._id;
-                        bank_approved.findOne({user:user._id}, (err, details)=>{
-                            if(details==null){
-                                if(data.account_number.length<10){
-                                    res.status(203).json({success:false, message:"please provide a valid account number"})
+                if(user.verified){
+                    hasher.compare_password(data.password, user.password).then(value=>{   
+                        if(value){
+                            data.user=user._id;
+                            bank_approved.findOne({user:user._id}, (err, details)=>{
+                                if(details==null){
+                                    if(data.account_number.length<10){
+                                        res.status(203).json({success:false, message:"please provide a valid account number"})
+                                    }else{
+                                        bank_approved.create(data, (err, bank_details)=>{
+                                            if(err)res.status(203).json({success:false, err:err, message:"error creating bank details"})
+                                            res.status(200).json({success:true, message:"bank details created successfully", details:bank_details})
+                                        })
+                                    }
                                 }else{
-                                    bank_approved.create(data, (err, bank_details)=>{
-                                        if(err)res.status(203).json({success:false, err:err, message:"error creating bank details"})
-                                        res.status(200).json({success:true, message:"bank details created successfully", details:bank_details})
-                                    })
+                                    res.status(203).json({success:false, message:"account already exist for you try applying for change of account"})
                                 }
+                            })
                             }else{
-                                res.status(203).json({success:false, message:"account already exist for you try applying for change of account"})
+                                res.status(203).json({success:false, message:"incorrect password"})
                             }
                         })
-                        }else{
-                            res.status(203).json({success:false, message:"incorrect password"})
-                        }
-                    })
+                }else{
+                    res.status(203).json({success:false, message:"verify account before creating card details"})  
+                }
             })
         }catch(e){
             res.status(500);
@@ -66,27 +70,31 @@ class Bank{
         }
         try{
             auth_user.verifyToken(req.token).then(user=>{
-                hasher.compare_password(data.password, user.password).then(value=>{   
-                    if(value){
-                        data.user=user._id;
-                        bank_pending.findOne({user:user._id}, (err, details)=>{
-                            if(details==null){
-                                if(data.account_number.length<10){
-                                    res.status(203).json({success:false, message:"please provide a valid account number"})
+                if(user.verified){
+                    hasher.compare_password(data.password, user.password).then(value=>{   
+                        if(value){
+                            data.user=user._id;
+                            bank_pending.findOne({user:user._id}, (err, details)=>{
+                                if(details==null){
+                                    if(data.account_number.length<10){
+                                        res.status(203).json({success:false, message:"please provide a valid account number"})
+                                    }else{
+                                        bank_pending.create(data, (err, bank_details)=>{
+                                            if(err)res.status(203).json({success:false, message:"error sending account for verification"})
+                                            res.status(200).json({success:true, message:"bank details sent to admin for verification"})
+                                        })
+                                    }
                                 }else{
-                                    bank_pending.create(data, (err, bank_details)=>{
-                                        if(err)res.status(203).json({success:false, message:"error sending account for verification"})
-                                        res.status(200).json({success:true, message:"bank details sent to admin for verification"})
-                                    })
+                                    res.status(203).json({success:false, message:"already applied for change of bank"})
                                 }
-                            }else{
-                                res.status(203).json({success:false, message:"already applied for change of bank"})
-                            }
-                        })
-                    }else{
-                        res.status(203).json({success:false, message:"incorrect password"})
-                    }
-                })
+                            })
+                        }else{
+                            res.status(203).json({success:false, message:"incorrect password"})
+                        }
+                    })
+                }else{
+                    res.status(203).json({success:false, message:"verify account before creating card details"})  
+                }
             })
         }catch(e){
             res.status(500);
