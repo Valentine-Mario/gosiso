@@ -45,6 +45,7 @@ class Payment{
             user:'',
             date:Date.now(),
             password:req.body.password,
+            suggesstion:req.body.suggesstion,
             bank:''
         }
         try{

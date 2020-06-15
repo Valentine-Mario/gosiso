@@ -5,6 +5,7 @@ var schema= new mongoose.Schema({
    user:{type:mongoose.Schema.Types.ObjectId, ref:'user'},
    bank:{type:mongoose.Schema.Types.ObjectId, ref:'bank_details'},
    date:Date,
+   suggesstion:{type:String},
    pending:{type:Boolean, default:true},
    approved:{type:Boolean, default:false}
 })
