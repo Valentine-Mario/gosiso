@@ -5,8 +5,8 @@ var schema=new mongoose.Schema({
     message:{type:String, required:true},
     user:{type:mongoose.Schema.Types.ObjectId, ref:'user'},
     viewed:{type:Boolean, default:false},
-    created_at:{type:Date}
-
+    created_at:{type:Date},
+    courier:{type:mongoose.Schema.Types.ObjectId, ref:'courier'}
 })
 schema.plugin(mongoosePaginate);
 module.exports= mongoose.model('notification', schema);

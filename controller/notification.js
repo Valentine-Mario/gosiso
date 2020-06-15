@@ -68,6 +68,23 @@ class notification{
         }
     }
 
+    wayBillNotification(user, title, message, courier){
+        var data={
+            title:title,
+            message:message,
+            user:user,
+            created_at:Date.now(),
+            courier:courier
+        }
+        try{
+            notificationModel.create(data, (err, waybillNotif)=>{
+                //do nothing
+            })
+        }catch(e){
+            console.log(e)
+        }
+    }
+
     getUnreadNotificationLength(req, res){
         try{
             auth_user.verifyToken(req.token).then(user=>{

@@ -6,7 +6,7 @@ var schema= new mongoose.Schema({
    user:{type:mongoose.Schema.Types.ObjectId, ref:'user'},
    date:Date,
    pick_up:{type:String, required:true},
-   delivery:{typeString, required:true},
+   delivery:{type:String, required:true},
    description:{type:String, required:true},
    recipient_name:{type:String, required:true},
    recipient_number:{type:String, required:true},
@@ -14,6 +14,7 @@ var schema= new mongoose.Schema({
    accepted:{type:Boolean, default:false},
    pending:{type:Boolean, default:true},
    canceled:{type:Boolean, default:false},
+   complete:{type:Boolean, default:false},
    images:[String]
 })
 schema.plugin(mongoosePaginate);

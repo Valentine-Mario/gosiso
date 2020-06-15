@@ -5,7 +5,8 @@ var schema= new mongoose.Schema({
    user:{type:mongoose.Schema.Types.ObjectId, ref:'user'},
    date:Date,
    agreed_fee:{type:Number, required:true},
-   waybill:{type:mongoose.Schema.Types.ObjectId, ref:'waybill'}
+   waybill:{type:mongoose.Schema.Types.ObjectId, ref:'waybill'},
+   dispute:{type:String, required:true}
 })
 schema.plugin(mongoosePaginate);
-module.exports= mongoose.model('pending_waybill_payment', schema);
+module.exports= mongoose.model('dispute', schema);

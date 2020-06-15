@@ -14,7 +14,8 @@ var bankRouter=require('./routes/banks')
 var notificationRouter=require('./routes/notification')
 var cardRouter=require('./routes/cards')
 var paymenyRouter=require('./routes/payment')
-var balanceHistory=require('./routes/balance_history')
+var balanceHistoryRouter=require('./routes/balance_history')
+var wayBillRouter=require('./routes/waybill')
 
 var app = express();
 app.use(logger('dev'));
@@ -57,7 +58,8 @@ app.use('/bank', bankRouter)
 app.use('/notif', notificationRouter)
 app.use('/card', cardRouter)
 app.use('/payment', paymenyRouter)
-app.use('/balancehistory', balanceHistory)
+app.use('/balancehistory', balanceHistoryRouter)
+app.use('/waybill', wayBillRouter);
 
 app.use(timeout.handler(options));
 
