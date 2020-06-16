@@ -21,6 +21,9 @@ router.get('/getactive', verification.verifyToken, wayBillController.getActive)
 router.get('/getpending', verification.verifyToken, wayBillController.getPending)
 router.get('/getcomplete', verification.verifyToken, wayBillController.getCompleted)
 router.get('/get/:id', wayBillController.getWayBillById)
+router.post('/updatewaybill/:id', verification.verifyToken, wayBillController.updateWaybill)
+router.post('/addpics/:id', upload.any(), verification.verifyToken, wayBillController.addPicsToWaybill)
+router.post('/removepics/:id', verification.verifyToken, wayBillController.removePics)
 
 
 //for couriers
@@ -28,5 +31,10 @@ router.get('/courier/getpending', verification.verifyToken, CourierWayBillContro
 router.get('/courier/getcanceled', verification.verifyToken, CourierWayBillController.getCanceledWaybill)
 router.get('/courier/getactive', verification.verifyToken, CourierWayBillController.getActiveWaybill)
 router.get('/courier/getcomplete', verification.verifyToken, CourierWayBillController.getCompltedWaybill)
+
+router.get('/courier/approvecancel/:id', verification.verifyToken, CourierWayBillController.approveCancel)
+router.post('/courier/disputecancel/:id', verification.verifyToken, CourierWayBillController.disputeCancel)
+router.post('/courier/cancel/:id', verification.verifyToken, CourierWayBillController.cancelWaybill)
+router.get('/courier/accept/:id', verification.verifyToken, CourierWayBillController.acceptWaybill)
 
 module.exports = router;

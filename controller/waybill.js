@@ -63,7 +63,7 @@ class Waybill{
                                                     res.status(203).json({success:false, message:"error creating waybill", err:err})
                                                 }else{
                                                     wayBillPayment.createPendingPayment(courier_details._id, user_details._id, data.agreed_fee, wayBillInfo._id)
-                                                    notificationController.wayBillNotification(courier_details.user, "Waybill pending", `You have a waybill request from ${data.recipient_name}`)
+                                                    notificationController.wayBillNotification(courier_details.user, "Waybill pending", `You have a waybill request from ${data.recipient_name}`, null, wayBillInfo._id)
                                                     var new_balance=(balance.balance- parseFloat(data.agreed_fee)).toFixed(2)
                                                     BalanceController.updateBalace(user_details, new_balance).then(success=>{
                                                         if(success){
@@ -103,7 +103,7 @@ class Waybill{
                     if(JSON.stringify(waybill.user)!==JSON.stringify(user_details._id)){
                         res.status(203).json({success:false, message:"unaithorized to edit this waybill"})
                     }else{
-                        waybillModel.findByIdAndUpdate(id, {canceled:true}, (err)=>{
+                        waybillModel.findByIdAndUpdate(id, {canceled:true, accepted:false}, (err)=>{
                             if(err){
                                 res.status(203).json({success:false, message:"error canceling waybill"})
                             }else{
@@ -217,6 +217,137 @@ class Waybill{
                 if(err)res.status(203).json({success:false, message:"error getting waybill", err:err})
                 res.status(200).json({success:true, message:waybill})
             }).populate("courier")
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    updateWaybill(req, res){
+        var id={_id:req.params.id}
+        var data={
+            service:req.body.service,
+            date:Date.now(),
+            pick_up:req.body.pick_up,
+            delivery:req.body.delivery,
+            description:req.body.description,
+            recipient_name:req.body.recipient_name,
+            recipient_number:req.body.recipient_number,
+            agreed_fee:req.body.agreed_fee,
+            pending:true,
+            canceled:false
+        }
+        try{
+            auth_user.verifyToken(req.token).then(user_details=>{
+                waybillModel.findById(id, (err, waybill_details)=>{
+                    waybillModel.findById(id, (err, waybill_details)=>{
+                        if(JSON.stringify(user_details._id)==JSON.stringify(waybill_details.user)){
+                            if(data.recipient_name==undefined){
+                                               
+                                data.recipient_name=user_details.firstName+' '+user_details.lastName
+                            }
+                            if(data.recipient_number==undefined){
+                                data.recipient_number=user_details.phone
+                            }
+                           
+                                    BalanceController.getBalance(user_details).then(balance=>{
+                                        withdrawal_request.findOne({$and:[{user:user_details._id}, {pending:true}]}, (err, withdrawalRequest)=>{
+                                            if(withdrawalRequest===null){
+                                                withdrawalRequest=0
+                                            }else{
+                                                withdrawalRequest=withdrawalRequest.amount
+                                            }
+                                            
+                                          var check_balance=parseFloat(data.agreed_fee)>(balance.balance- withdrawalRequest)
+                                            if(check_balance){
+                                                res.status(203).json({success:false, message:"insufficient balance be sure that your pending withdrawal deducted from your balance is sufficient"})
+                                            }else{
+                                                waybillModel.findByIdAndUpdate(id, data, (err)=>{
+                                                    if(err){
+                                                        res.status(203).json({success:false, message:"error updating status", err:err})
+                                                    }else{
+                                                        wayBillPayment.createPendingPayment(waybill_details.courier, waybill_details.user, data.agreed_fee, waybill_details._id)
+                                                        notificationController.wayBillNotification(waybill_details.courier.user, "Waybill Resent", `Waybill with the id ${waybill_details._id} has been updated. Check your pending waybill`, null, waybill_details._id)
+                                                        var new_balance=(balance.balance- parseFloat(data.agreed_fee)).toFixed(2)
+                                                        BalanceController.updateBalace(user_details, new_balance).then(success=>{
+                                                            if(success){
+                                                                balanceHistory.createData(data.amount, user_details, `Waybill successfully sent`, 'debit')
+                                                            }
+                                                        })
+                                                        res.status(200).json({success:true, message:"waybill sent successfully"});
+                                                    }
+                                                })
+                                            }
+                                        })
+                                       
+                                    })
+                        }else{
+                           res.status(203).json({success:false, message:"unauthorised to this data"}) 
+                        }
+                    })
+                }).populate('courier')
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    addPicsToWaybill(req, res){
+        var id={_id:req.params.id}
+        var data={
+            images:req.files
+        }
+        var img_count=0
+        try{
+            auth_user.verifyToken(req.token).then(user=>{
+                waybillModel.findById(id, (err, waybill_details)=>{
+                    if(JSON.stringify(user._id)==JSON.stringify(waybill_details.user)){
+                        for(var i=0; i< data.images.length; i++){
+                            cloud.pics_upload(data.images[i].path).then(val=>{
+                                img_count++
+                                waybill_details.images.push(val.secure_url)
+                                
+                                //track for successful upload then terminate function
+                                if(img_count==data.images.length){
+                                    res.status(200).json({success:true, message:"upload successful"})
+                                    waybill_details.save()
+                                }
+                                
+                                })
+                            }
+                    }else{
+                        res.status(203).json({success:false, message:"unauthorised to this data"}) 
+                    }
+                })
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    removePics(req, res){
+        var id={_id:req.params.id}
+        var data={
+            images:req.body.images
+        }
+        try{
+            auth_user.verifyToken(req.token).then(user=>{
+                waybillModel.findById(id, (err, waybill_details)=>{
+                    if(JSON.stringify(user._id)==JSON.stringify(waybill_details.user)){
+                        if(waybill_details.images.includes(data.images)){
+                            waybill_details.images.splice(waybill_details.images.indexOf(data.images), 1)
+                            waybill_details.save()
+                            res.status(200).json({status:true, message:"image successfully removed"})
+                            }else{
+                                res.status(203).json({status:false, message:"image not found"})
+                            }
+                    }else{
+                        res.status(203).json({success:false, message:"unauthorised to this data"}) 
+                    }
+                })
+            })
         }catch(e){
             res.status(500)
             console.log(e)

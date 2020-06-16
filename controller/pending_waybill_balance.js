@@ -20,5 +20,27 @@ class WayBillPayment{
         }
     }
 
+    getPendingWaybillPayment(waybill){
+        try{
+            return new Promise((resolve, reject)=>{
+            wayBillPaymentModel.findOne({waybill:waybill}, (err, waybill_details)=>{
+                resolve(waybill_details)
+            })
+        })
+        }catch(e){
+            console.log(e)
+        }
+    }
+
+    deletePendingPayment(waybill){
+        try{
+            wayBillPaymentModel.findOneAndDelete({waybill:waybill}, (err)=>{
+                //do nothinf
+            })
+        }catch(e){
+            console.log(e)
+        }
+    }
+
 }
 module.exports=new WayBillPayment()

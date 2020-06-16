@@ -253,7 +253,7 @@ class admin{
                             courier_details.save()
                             res.status(200).json({status:true, message:"image successfully removed"})
                             }else{
-                                res.status(201).json({status:false, message:"image not found"})
+                                res.status(203).json({status:false, message:"image not found"})
                             }
                     })
                 }
