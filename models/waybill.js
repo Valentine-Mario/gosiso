@@ -15,6 +15,7 @@ var schema= new mongoose.Schema({
    pending:{type:Boolean, default:true},
    canceled:{type:Boolean, default:false},
    complete:{type:Boolean, default:false},
+   dispute:{type:Boolean, default:false},
    images:[String]
 })
 schema.plugin(mongoosePaginate);

@@ -68,13 +68,14 @@ class notification{
         }
     }
 
-    wayBillNotification(user, title, message, courier){
+    wayBillNotification(user, title, message, courier, waybill){
         var data={
             title:title,
             message:message,
             user:user,
             created_at:Date.now(),
-            courier:courier
+            courier:courier,
+            waybill:waybill
         }
         try{
             notificationModel.create(data, (err, waybillNotif)=>{

@@ -108,7 +108,8 @@ class Waybill{
                                 res.status(203).json({success:false, message:"error canceling waybill"})
                             }else{
                                 res.status(200).json({success:true, message:"waybill canceled successfully. The courier would be notified to either accept this change or dispute it"})
-                                notificationController.wayBillNotification(waybill.courier.user, "Waybill canceled", `A user has canceled a waybill request for the following reason: ${data.reason}.\n Check your pending waybills to take action`)
+                                notificationController.wayBillNotification(waybill.courier.user, "Waybill canceled", `Waybill with id ${waybill._id} for recipent ${waybill.recipient_name} has been canceled for the following reason: ${data.reason}. Check your pending waybills to accept cancel or dispute`, 
+                               null, waybill._id)
                             }
                         })
                     }
@@ -123,7 +124,7 @@ class Waybill{
     //active when accepted is true and pending false
     //canceled when canceled is true and pending false
     //pending when pending is true
-    //completed when complete is true
+    //completed when complete is true and pending is false
 
     getCompleted(req, res){
         var {page, limit}= req.query;
@@ -135,7 +136,7 @@ class Waybill{
             }
         try{
             auth_user.verifyToken(req.token).then(user_details=>{
-                waybillModel.paginate({$and:[{user:user_details._id}, {complete:true}]}, options, (err, waybill)=>{
+                waybillModel.paginate({$and:[{user:user_details._id}, {complete:true}, {pending:false}, {accepted:true}, {dispute:false}]}, options, (err, waybill)=>{
                     if(err)res.status(203).json({success:false, message:"error getting waybill", err:err})
                     res.status(200).json({success:true, message:waybill})
                 })
@@ -156,7 +157,7 @@ class Waybill{
         }
     try{
         auth_user.verifyToken(req.token).then(user_details=>{
-            waybillModel.paginate({$and:[{user:user_details._id}, {accepted:true}, {pending:false}]}, options, (err, waybill)=>{
+            waybillModel.paginate({$and:[{user:user_details._id}, {accepted:true}, {pending:false}, {dispute:false}, {complete:false}]}, options, (err, waybill)=>{
                 if(err)res.status(203).json({success:false, message:"error getting waybill", err:err})
                 res.status(200).json({success:true, message:waybill})
             })
@@ -177,7 +178,7 @@ class Waybill{
         }
     try{
         auth_user.verifyToken(req.token).then(user_details=>{
-            waybillModel.paginate({$and:[{user:user_details._id}, {pending:true}]}, options, (err, waybill)=>{
+            waybillModel.paginate({$and:[{user:user_details._id}, {pending:true}, {dispute:false}]}, options, (err, waybill)=>{
                 if(err)res.status(203).json({success:false, message:"error getting waybill", err:err})
                 res.status(200).json({success:true, message:waybill})
             })
@@ -198,7 +199,7 @@ class Waybill{
         }
     try{
         auth_user.verifyToken(req.token).then(user_details=>{
-            waybillModel.paginate({$and:[{user:user_details._id}, {pending:false}, {canceled:true}]}, options, (err, waybill)=>{
+            waybillModel.paginate({$and:[{user:user_details._id}, {pending:false}, {canceled:true}, {dispute:false}]}, options, (err, waybill)=>{
                 if(err)res.status(203).json({success:false, message:"error getting waybill", err:err})
                 res.status(200).json({success:true, message:waybill})
             })
