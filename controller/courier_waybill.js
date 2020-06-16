@@ -206,24 +206,28 @@ class courier_waybill{
         try{
             auth_user.verifyToken(req.token).then(user=>{
                 waybillModel.findById(id, (err, waybill_details)=>{
-                    courierModel.findOne({user:user._id}, (err, courier_details)=>{
-                        if(JSON.stringify(waybill_details.courier)==JSON.stringify(courier_details._id)){
-                            
-                            waybillModel.findByIdAndUpdate(id, {pending:false, accepted:true}, (err)=>{
-                                    if(err){
-                                        res.status(203).json({success:false, message:"error accepting waybill", err:err})
-                                    }else{
-                                        res.status(200).json({success:true, message:"waybill accepted"})
-                                        notificationController.wayBillNotification(waybill_details.user, "Waybill accepted", `Waybill with id ${waybill_details._id} has been accepted by the courier`,
-                                        null, waybill_details._id)
-             
-                                    }
+                    if(waybill_details.canceled==true){
+                        res.status(203).json({success:false, message:"can't accept waybill that has been canceled. Try disputing it to be resolved by the admin"})
+                    }else{
+                        courierModel.findOne({user:user._id}, (err, courier_details)=>{
+                            if(JSON.stringify(waybill_details.courier)==JSON.stringify(courier_details._id)){
                                 
-                            })
-                        }else{
-                            res.status(203).json({success:false, message:"unauthorised to this data"})
-                        }
-                    })
+                                waybillModel.findByIdAndUpdate(id, {pending:false, accepted:true}, (err)=>{
+                                        if(err){
+                                            res.status(203).json({success:false, message:"error accepting waybill", err:err})
+                                        }else{
+                                            res.status(200).json({success:true, message:"waybill accepted"})
+                                            notificationController.wayBillNotification(waybill_details.user, "Waybill accepted", `Waybill with id ${waybill_details._id} has been accepted by the courier`,
+                                            null, waybill_details._id)
+                 
+                                        }
+                                    
+                                })
+                            }else{
+                                res.status(203).json({success:false, message:"unauthorised to this data"})
+                            }
+                        })
+                    }
                    }) 
             })
         }catch(e){

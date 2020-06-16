@@ -27,64 +27,68 @@ class Waybill{
         var img=[];
         try{
            auth_user.verifyToken(req.token).then(user_details=>{
-            courierModel.findById(id, (err, courier_details)=>{
-                if(JSON.stringify(courier_details.user._id)==JSON.stringify(user_details._id)){
-                    res.status(203).json({success:false, message:"can't send waybill to yourself"})
-                }else{
-                    BalanceController.getBalance(user_details).then(balance=>{
-                        withdrawal_request.findOne({$and:[{user:user_details._id}, {pending:true}]}, (err, withdrawalRequest)=>{
-                            if(withdrawalRequest===null){
-                                withdrawalRequest=0
-                            }else{
-                                withdrawalRequest=withdrawalRequest.amount
-                            }
-                            
-                          var check_balance=parseFloat(data.agreed_fee)>(balance.balance- withdrawalRequest)
-                            if(check_balance){
-                                res.status(203).json({success:false, message:"insufficient balance be sure that your pending withdrawal deducted from your balance is sufficient"})
-                            }else{
-                                var count=data.images.length
-                                for(var i=0; i< data.images.length; i++){
-                                    cloud.pics_upload(data.images[i].path).then(val=>{
-                                        img.push(val.secure_url);
-                                        if(count==img.length){
-                                            data.images=img
-                                            data.user=user_details._id;
-                                            data.courier=courier_details._id
-                                            if(data.recipient_name==undefined){
-                                               
-                                                data.recipient_name=user_details.firstName+' '+user_details.lastName
-                                            }
-                                            if(data.recipient_number==undefined){
-                                                data.recipient_number=user_details.phone
-                                            }
-                                            waybillModel.create(data, (err, wayBillInfo)=>{
-                                                if(err){
-                                                    res.status(203).json({success:false, message:"error creating waybill", err:err})
-                                                }else{
-                                                    wayBillPayment.createPendingPayment(courier_details._id, user_details._id, data.agreed_fee, wayBillInfo._id)
-                                                    notificationController.wayBillNotification(courier_details.user, "Waybill pending", `You have a waybill request from ${data.recipient_name}`, null, wayBillInfo._id)
-                                                    var new_balance=(balance.balance- parseFloat(data.agreed_fee)).toFixed(2)
-                                                    BalanceController.updateBalace(user_details, new_balance).then(success=>{
-                                                        if(success){
-                                                            balanceHistory.createData(data.amount, user_details, `Waybill successfully sent`, 'debit')
-                                                        }
-                                                    })
-                                                    res.status(200).json({success:true, message:"waybill sent successfully"});
-            
+               if(user_details.verified==false){
+                   res.status(203).json({success:false, message:"verify email before sending waybill"})
+               }else{
+                courierModel.findById(id, (err, courier_details)=>{
+                    if(JSON.stringify(courier_details.user._id)==JSON.stringify(user_details._id)){
+                        res.status(203).json({success:false, message:"can't send waybill to yourself"})
+                    }else{
+                        BalanceController.getBalance(user_details).then(balance=>{
+                            withdrawal_request.findOne({$and:[{user:user_details._id}, {pending:true}]}, (err, withdrawalRequest)=>{
+                                if(withdrawalRequest===null){
+                                    withdrawalRequest=0
+                                }else{
+                                    withdrawalRequest=withdrawalRequest.amount
+                                }
+                                
+                              var check_balance=parseFloat(data.agreed_fee)>(balance.balance- withdrawalRequest)
+                                if(check_balance){
+                                    res.status(203).json({success:false, message:"insufficient balance be sure that your pending withdrawal deducted from your balance is sufficient"})
+                                }else{
+                                    var count=data.images.length
+                                    for(var i=0; i< data.images.length; i++){
+                                        cloud.pics_upload(data.images[i].path).then(val=>{
+                                            img.push(val.secure_url);
+                                            if(count==img.length){
+                                                data.images=img
+                                                data.user=user_details._id;
+                                                data.courier=courier_details._id
+                                                if(data.recipient_name==undefined){
+                                                   
+                                                    data.recipient_name=user_details.firstName+' '+user_details.lastName
                                                 }
-                                            })
-                                        }
-                                    })
+                                                if(data.recipient_number==undefined){
+                                                    data.recipient_number=user_details.phone
+                                                }
+                                                waybillModel.create(data, (err, wayBillInfo)=>{
+                                                    if(err){
+                                                        res.status(203).json({success:false, message:"error creating waybill", err:err})
+                                                    }else{
+                                                        wayBillPayment.createPendingPayment(courier_details._id, user_details._id, data.agreed_fee, wayBillInfo._id)
+                                                        notificationController.wayBillNotification(courier_details.user, "Waybill pending", `You have a waybill request from ${data.recipient_name}`, null, wayBillInfo._id)
+                                                        var new_balance=(balance.balance- parseFloat(data.agreed_fee)).toFixed(2)
+                                                        BalanceController.updateBalace(user_details, new_balance).then(success=>{
+                                                            if(success){
+                                                                balanceHistory.createData(data.amount, user_details, `Waybill successfully sent`, 'debit')
+                                                            }
+                                                        })
+                                                        res.status(200).json({success:true, message:"waybill sent successfully"});
+                
+                                                    }
+                                                })
+                                            }
+                                        })
+                                       
+                                    }
                                    
                                 }
-                               
-                            }
+                            })
+                           
                         })
-                       
-                    })
-                }
-            }).populate('user')
+                    }
+                }).populate('user')
+               }
            }) 
         }catch(e){
             res.status(500)
@@ -240,7 +244,6 @@ class Waybill{
         try{
             auth_user.verifyToken(req.token).then(user_details=>{
                 waybillModel.findById(id, (err, waybill_details)=>{
-                    waybillModel.findById(id, (err, waybill_details)=>{
                         if(JSON.stringify(user_details._id)==JSON.stringify(waybill_details.user)){
                             if(data.recipient_name==undefined){
                                                
@@ -284,12 +287,55 @@ class Waybill{
                         }else{
                            res.status(203).json({success:false, message:"unauthorised to this data"}) 
                         }
-                    })
+                    
                 }).populate('courier')
             })
         }catch(e){
             res.status(500)
             console.log(e)
+        }
+    }
+
+    MarkWaybillasComplete(req, res){
+        var id={_id:req.params.id}
+        try{
+            auth_user.verifyToken(req.token).then(user_details=>{
+                waybillModel.findById(id, (err, waybill_details)=>{
+                        if(JSON.stringify(user_details._id)==JSON.stringify(waybill_details.user)){
+                            if(waybill_details.accepted!==true){
+                                res.status(203).json({success:false, message:"you can't mark waybill as complete if it hasn't been accepted"})
+                            }else{
+                                waybillModel.findByIdAndUpdate(id, {complete:true}, (err)=>{
+                                    BalanceController.getBalance(waybill_details.courier.user).then(balance=>{
+                                        wayBillPayment.getPendingWaybillPayment(waybill_details._id).then(waybill_payment=>{
+                                            waybill_payment=waybill_payment.agreed_fee*0.8
+                                            var new_balance=(balance.balance+waybill_payment).toFixed(2)
+                                            BalanceController.updateBalace(waybill_details.courier.user, new_balance).then(success=>{
+                                                if(success){
+                                                    balanceHistory.createData(waybill_payment, waybill_details.courier.user, "earning from waybill",
+                                                    "credit");
+                                                    notificationController.wayBillNotification(waybill_details.courier.user._id, "Waybill Complete", `Waybill with the id ${waybill_details._id} has been marked as complete`)
+
+                                                    res.status(200).json({success:true, message:"waybill marked as complete"})
+                                                    wayBillPayment.deletePendingPayment(waybill_details._id)
+                                                }else{
+                                                    res.status(203).json({success:false, message:"error updating balance"})
+                                                }
+                                            })
+
+                                        })
+                                    })
+                                })
+                            }
+                        }else{
+                            res.status(203).json({success:false, message:"unauthorised to this data"}) 
+                        }
+                    }).populate({path:'courier',
+                    populate: { path: 'user' }})
+            })
+        }catch(e){
+            console.log(e)
+            res.status(500)
         }
     }
 

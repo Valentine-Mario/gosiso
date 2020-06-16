@@ -153,7 +153,15 @@ class user{
                 try{
                     auth_user.verifyToken(req.token).then(user=>{
                         balance.getBalance(user).then(balance=>{
-                            res.status(200).json({success:true, message:user, balance:balance})
+                            courierModel.findOne({$and:[{user:user._id}, {verifiedCourier:true}]}, (err, courier)=>{
+                                if(courier==null){
+                                   var courierStatus=false
+                                }else{
+                                    var courierStatus=true
+                                }
+                                res.status(200).json({success:true, message:user, balance:balance, isCourier:courierStatus})
+
+                            })
                         })
                     })
                 }catch(e){

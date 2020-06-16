@@ -24,6 +24,7 @@ router.get('/get/:id', wayBillController.getWayBillById)
 router.post('/updatewaybill/:id', verification.verifyToken, wayBillController.updateWaybill)
 router.post('/addpics/:id', upload.any(), verification.verifyToken, wayBillController.addPicsToWaybill)
 router.post('/removepics/:id', verification.verifyToken, wayBillController.removePics)
+router.get('/markascomplete/:id', verification.verifyToken, wayBillController.MarkWaybillasComplete)
 
 
 //for couriers
