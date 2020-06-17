@@ -21,7 +21,8 @@ var schema=new mongoose.Schema({
     rate:{type:Number, default:0},
     wareHouseImage:[String],
     locationImage:{type:String},
-    verified_address:{type:String}
+    verified_address:{type:String},
+    suspended:{type:Boolean, default:false}
 })
 schema.plugin(mongoosePaginate);
 module.exports= mongoose.model('courier', schema);

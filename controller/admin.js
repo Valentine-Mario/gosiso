@@ -165,7 +165,8 @@ class admin{
                                             if(err){
                                                 res.status(203).json({success:false, message:"error approving application", err:err})
                                             }else{
-                                                notificationModel.approveNotification(courier.user);
+                                                userModel.findByIdAndUpdate(courier.user, {verifiedCourier:true}, (err)=>{
+                                                    notificationModel.approveNotification(courier.user);
                                                 WorkQueue.process( job => {
                                                     //queue mailing job
                                                    mail.approvecourier(job.data.email, "Courier Approved", courier.user.firstName)
@@ -174,6 +175,7 @@ class admin{
                                                     console.log(`Job completed with result`);
                                                   })
                                                 res.status(200).json({success:true, message:"application approved successfully"})
+                                                })
                                             }
                                         })
                                     })
@@ -188,6 +190,79 @@ class admin{
             res.status(500)
             console.log(e)
         }
+    }
+
+    suspendCourier(req, res){
+        var id={_id:req.params.id}
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    courierModel.findById(id, (err, courier_details)=>{
+                        courierModel.findByIdAndUpdate(id, {suspended:true}, (err)=>{
+                            if(err){
+                                res.status(203).json({success:false, message:"error updating courier status"})
+                            }else{
+                                res.status(200).json({success:true, message:"courier suspended successfully"})
+                                notificationModel.wayBillNotification(courier_details.user, 'suspension notice', "You have been temporarily suspended as a courier")
+                            }
+                        })
+                    })
+                }
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    unsuspendedCourier(req, res){
+        var id={_id:req.params.id}
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    courierModel.findById(id, (err, courier_details)=>{
+                        courierModel.findByIdAndUpdate(id, {suspended:false}, (err)=>{
+                            if(err){
+                                res.status(203).json({success:false, message:"error updating courier status"})
+                            }else{
+                                res.status(200).json({success:true, message:"courier unsuspended successfully"})
+                                notificationModel.wayBillNotification(courier_details.user, 'unsuspension notice', "You have been unsuspended. You can now be booked again")
+                            }
+                        })
+                    })
+                }
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    getSuspendedOrUnsuspended(req, res){
+        var {page, limit}= req.query;
+        var options={
+            page:parseInt(page, 10) || 1,
+            limit:parseInt(limit, 10) || 10,
+            sort:{'_id':-1},
+            populate:'user'
+        }
+        var data={
+            suspended:req.data.suspended
+        }
+        auth_user.verifyTokenAdmin(req.token).then(admin=>{
+            if(admin==null){
+                res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+            }else{
+                courierModel.paginate({suspended:data.suspended}, options, (err, couriers)=>{
+                    if(err)res.status(203).json({success:false, message:"error getting couriers"})
+                    res.status(200).json({success:true, message:couriers})
+                })
+            }
+        })
     }
 
     editAddress(req, res){

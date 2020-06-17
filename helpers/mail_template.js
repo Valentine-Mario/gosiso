@@ -36,5 +36,29 @@ class mail_template{
         </div>`
         return template
     }
+
+    arrivedWayBill(waybill){
+        var template=`<div>
+            Your waybill with id ${waybill._id} has successfully arrived at ${waybill.delivery}
+        </div>`
+        return template
+    }
+
+    waybillDetails(waybill){
+        var template=`<div>
+        You have accepted this waybill with id ${waybill._id}:
+        Pickup location:${waybill.pick_up}<br/>
+        Service:${waybill.service}</br/>
+        Drop location:${waybill.delivery}</br/>
+        Description:${waybill.description}<br/>
+        Recipient name:${waybill.recipient_name}<br/>
+        Recipient number:${waybill.recipient_number}<br/>
+        Fee:${waybill.agreed_fee}<br/>
+        Image sample<br/>
+        <img src=${waybill.images[0]} width=150 height=150>
+        </div>`
+        return template
+    }
+    
 }
 module.exports=new mail_template()

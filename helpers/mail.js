@@ -105,5 +105,47 @@
             });
         })
       }
+
+      acceptWaybill(email, waybill){
+        return new Promise((resolve, reject)=>{
+          var mailTemplate  = template.waybillDetails(waybill)
+          var mailOptions = {
+              from: '"Gosiso"',
+              to: email,
+              subject: "Waybill details",
+              html: `${mailTemplate}`
+            };
+            transporter.sendMail(mailOptions, function(error, info){
+              if (error) {
+                console.log(error, false)
+                reject(false)
+              } else {
+                  console.log(true)
+                  resolve(true)
+              }
+            });
+        })
+      }
+
+      arrivedWaybill(email, waybill){
+        return new Promise((resolve, reject)=>{
+          var mailTemplate  = template.arrivedWayBill(waybill)
+          var mailOptions = {
+              from: '"Gosiso"',
+              to: email,
+              subject: "Waybill Arrived",
+              html: `${mailTemplate}`
+            };
+            transporter.sendMail(mailOptions, function(error, info){
+              if (error) {
+                console.log(error, false)
+                reject(false)
+              } else {
+                  console.log(true)
+                  resolve(true)
+              }
+            });
+        })
+      }
       }
       module.exports=new mailer()

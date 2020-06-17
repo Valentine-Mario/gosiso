@@ -153,15 +153,9 @@ class user{
                 try{
                     auth_user.verifyToken(req.token).then(user=>{
                         balance.getBalance(user).then(balance=>{
-                            courierModel.findOne({$and:[{user:user._id}, {verifiedCourier:true}]}, (err, courier)=>{
-                                if(courier==null){
-                                   var courierStatus=false
-                                }else{
-                                    var courierStatus=true
-                                }
-                                res.status(200).json({success:true, message:user, balance:balance, isCourier:courierStatus})
+                           
+                            res.status(200).json({success:true, message:user, balance:balance})
 
-                            })
                         })
                     })
                 }catch(e){
@@ -174,7 +168,6 @@ class user{
                 var data={
                     firstName:req.body.firstName,
                     lastName:req.body.lastName,
-                    email:req.body.email,
                     phone:req.body.phone
                 }
                 try{
@@ -229,27 +222,66 @@ class user{
                 }
             }
 
+            updateEmail(req, res){
+                var data={
+                    email:req.body.email
+                }
+                var password=req.body.password
+                try{
+                    auth_user.verifyToken(req.token).then(decoded_user=>{
+                        hasher.compare_password(password, decoded_user.password).then(value=>{
+                           
+                            if(value==true){
+                                userModel.findByIdAndUpdate(decoded_user._id, data, (err)=>{
+                                    if(err){
+                                        if (err.name === 'MongoError' && err.code === 11000) {
+                                            res.status(203).json({success:false, message:"email already exist"})
+                                          }
+                                       } else{
+                                        res.status(200).json({success:true, message:"update successful"});
+                                       }  
+                                })
+                            }else{
+                                res.status(203).json({success:false, message:"incorrect password"})
+                            }
+                        })
+                    })
+                }catch(e){
+                    console.log(e)
+                    res.status(500)
+                }
+            }
+
 
             deleteAccount(req, res){
+                var data={
+                    password:req.body.password
+                }
                 try{
                     auth_user.verifyToken(req.token).then(user=>{
-                        userModel.findByIdAndDelete(user._id, err=>{
-                            if(err){
-                                res.status(203).json({success:false, message:"error deleting account"})
-                            }else{
-                                courierModel.findOne({user:user._id}, (err, courierAcc)=>{
+                        hasher.compare_password(data.password, user.password).then(value=>{
+                            if(value==true){
+                                userModel.findByIdAndDelete(user._id, err=>{
                                     if(err){
-                                        res.status(203).json({success:false, message:"error getting courier account"})
+                                        res.status(203).json({success:false, message:"error deleting account"})
                                     }else{
-                                        if(courierAcc==null){
-                                            res.status(200).json({success:true, message:"account deleted successfully"})
-                                        }else{
-                                            courierModel.findOneAndDelete({user:user._id}, (err)=>{
-                                                res.status(200).json({success:true, message:"account deleted successfully"})
-                                            })
-                                        }
+                                        courierModel.findOne({user:user._id}, (err, courierAcc)=>{
+                                            if(err){
+                                                res.status(203).json({success:false, message:"error getting courier account"})
+                                            }else{
+                                                if(courierAcc==null){
+                                                    res.status(200).json({success:true, message:"account deleted successfully"})
+                                                }else{
+                                                    courierModel.findOneAndDelete({user:user._id}, (err)=>{
+                                                        res.status(200).json({success:true, message:"account deleted successfully"})
+                                                    })
+                                                }
+                                            }
+                                        })
                                     }
                                 })
+                            }else{
+                                res.status(203).json({success:false, message:"incorrect password"}) 
                             }
                         })
                     })

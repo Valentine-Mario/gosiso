@@ -37,5 +37,6 @@ router.get('/courier/approvecancel/:id', verification.verifyToken, CourierWayBil
 router.post('/courier/disputecancel/:id', verification.verifyToken, CourierWayBillController.disputeCancel)
 router.post('/courier/cancel/:id', verification.verifyToken, CourierWayBillController.cancelWaybill)
 router.get('/courier/accept/:id', verification.verifyToken, CourierWayBillController.acceptWaybill)
+router.get('/courier/markasarrived/:id', verification.verifyToken, CourierWayBillController.markWaybillAsArrived)
 
 module.exports = router;

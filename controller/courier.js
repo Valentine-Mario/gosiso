@@ -84,7 +84,7 @@ class Courier{
                 populate:'user'
             }
         try{
-            courierModel.paginate({$and:[{"state":{$regex: value, $options: 'gi'}}, {pendingApproval:false}, {verifiedCourier:true}]}, options, (err, couriers)=>{
+            courierModel.paginate({$and:[{"state":{$regex: value, $options: 'gi'}},{suspended:false}, {pendingApproval:false}, {verifiedCourier:true}]}, options, (err, couriers)=>{
                 if(err)res.status(203).json({success:false, message:"error searching courier", err:err})
                 res.status(200).json({success:true, message:couriers})
             })

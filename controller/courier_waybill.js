@@ -8,6 +8,10 @@ const withdrawal_request=require('../models/withdrawal_request')
 const notificationController=require('./notification')
 const wayBillPayment=require('./pending_waybill_balance')
 const disputeModel=require('../models/dispute')
+const mail=require("../helpers/mail");
+var Queue = require('bull');
+const REDIS_URL=process.env.REDIS_URL||'redis://127.0.0.1:6379'
+const WorkQueue = new Queue('email', REDIS_URL);
 
 class courier_waybill{
     getPendingWaybill(req, res){
@@ -217,9 +221,17 @@ class courier_waybill{
                                             res.status(203).json({success:false, message:"error accepting waybill", err:err})
                                         }else{
                                             res.status(200).json({success:true, message:"waybill accepted"})
-                                            notificationController.wayBillNotification(waybill_details.user, "Waybill accepted", `Waybill with id ${waybill_details._id} has been accepted by the courier`,
+                                            notificationController.wayBillNotification(waybill_details.user._id, "Waybill accepted", `Waybill with id ${waybill_details._id} has been accepted by the courier`,
                                             null, waybill_details._id)
-                 
+                                            
+                                            WorkQueue.add({email:waybill_details.user.email}, { attempts: 5});
+                                            WorkQueue.process( job => {
+                                                //queue mailing job
+                                               mail.acceptWaybill(job.data.email, waybill_details);
+                                              })
+                                              WorkQueue.on('completed', (job, result) => {
+                                                console.log(`Job completed with result`);
+                                              })
                                         }
                                     
                                 })
@@ -228,7 +240,7 @@ class courier_waybill{
                             }
                         })
                     }
-                   }) 
+                   }).populate('user')
             })
         }catch(e){
             console.log(e)
@@ -273,6 +285,40 @@ class courier_waybill{
                         }
                     })
                    
+                }).populate('user')
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    markWaybillAsArrived(req, res){
+        var id={_id:req.params.id}
+        try{
+            auth_user.verifyToken(req.token).then(user=>{
+                waybillModel.findById(id, (err, waybill_details)=>{
+                    if(waybill_details.accepted==false){
+                        res.status(203).json({message:"you cannot mark a waybill as arrived when it hasn't been accepted"})
+                    }else{
+                        courierModel.findOne({user:user._id}, (err, courier_details)=>{
+                            if(JSON.stringify(waybill_details.courier)==JSON.stringify(courier_details._id)){
+                                notificationController.wayBillNotification(waybill_details.user._id, "Waybill arrived", `Waybill with id ${waybill_details._id} has arrived at ${waybill_details.delivery}`, null, 
+                                waybill_details._id)
+                                WorkQueue.add({email:waybill_details.user.email}, { attempts: 5});
+                                WorkQueue.process( job => {
+                                    //queue mailing job
+                                   mail.arrivedWaybill(job.data.email, waybill_details);
+                                  })
+                                  WorkQueue.on('completed', (job, result) => {
+                                    console.log(`Job completed with result`);
+                                  })
+                                  res.status(200).json({success:true, message:"user has been duly alerted"})
+                            }else{
+                                res.status(203).json({success:false, message:"unauthorised to this data"}) 
+                            }
+                        })
+                    }
                 }).populate('user')
             })
         }catch(e){
