@@ -200,5 +200,17 @@ class DisputeWaybill{
             console.log(e)
         }
     }
+
+    CacelWaybill(req, res){
+
+    }
+
+    MarkWaybillasActive(req, res){
+
+    }
+
+    MarkWaybillasComplete(req, res){
+        
+    }
 }
 module.exports=new DisputeWaybill()
