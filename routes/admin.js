@@ -33,6 +33,8 @@ router.get('/searchuser/:value', verification.verifyToken, admin.searchUser)
 router.get('/suspendcourier/:id', verification.verifyToken, admin.suspendCourier)
 router.get('/unsuspendcourier/:id', verification.verifyToken, admin.unsuspendedCourier)
 router.post('/getcouriertype/:id', verification.verifyToken, admin.getSuspendedOrUnsuspended)
+router.post('/edituserdetails/:id', verification.verifyToken, admin.editUserDetails)
+router.get('/deleteuserdetails/:id', verification.verifyToken, admin.deleteUserDetails)
 
 //bank stuff
 router.get('/getpendingbank', verification.verifyToken, pending_banks.getPendingBanks)

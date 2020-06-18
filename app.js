@@ -23,7 +23,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+const rateLimit = require("express-rate-limit");
+ 
+// Enable if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
+// see https://expressjs.com/en/guide/behind-proxies.html
+ app.set('trust proxy', 1);
+ 
+const limiter = rateLimit({
+  windowMs: 5 * 60 * 1000, 
+  max: 3 ,
+  message:"Three trials exceeded, try again after 5 minutes"
+});
+ 
+//  apply to all requests
+app.use('/user/login', limiter);
+app.use('/admin/login', limiter)
 
 app.use(function(req, res, next) {
   

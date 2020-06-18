@@ -476,5 +476,53 @@ class admin{
             console.log(e)
         }
     }
+
+    editUserDetails(req, res){
+        var id={_id:req.params.id}
+        var data={
+            firstName:req.body.firstName,
+            lastName:req.body.lastName,
+            phone:req.body.phone
+        }
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    userModel.findByIdAndUpdate(id, data, (err)=>{
+                        if(err){
+                            if (err.name === 'MongoError' && err.code === 11000) {
+                                res.status(203).json({success:false, message:"email or phone number already exist"})
+                              }
+                           } else{
+                            res.status(200).json({success:true, message:"update successful"});
+                           } 
+                    })
+                }
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    deleteUserDetails(req, res){
+        var id={_id:req.params.id}
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    userModel.findByIdAndDelete(id, (err)=>{
+                        if(err)res.status(203).json({success:false, message:"error deleting user details", err:err})
+                        res.status(200).json({success:true, message:"user details deleted successfully"})
+                    })
+                }
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
 }
 module.exports=new admin()
