@@ -42,6 +42,7 @@ router.post('/changebankpendingstatus/:id', verification.verifyToken, pending_ba
 //withdrawal stuffs
 router.post('/viewwithdrawalrequest', verification.verifyToken, withdrawal_request.getPendingWithdrawal)
 router.post('/withdrawalreview/:id', verification.verifyToken, withdrawal_request.reviewRequest)
+router.post('/topupuser/:id', verification.verifyToken, withdrawal_request.topUp)
 
 //waybill stuff
 router.get('/waybill/getdispute', verification.verifyToken, adminWaybillController.getDisputeWaybill)

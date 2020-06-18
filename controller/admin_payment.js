@@ -7,7 +7,7 @@ const REDIS_URL=process.env.REDIS_URL||'redis://127.0.0.1:6379'
 const WorkQueue = new Queue('email', REDIS_URL);
 const BalanceHistory=require('./balace_history')
 const BalanceController=require('./balance')
-
+const userModel=require('../models/user')
 
 class AdminPayment{
     getPendingWithdrawal(req, res){
@@ -53,7 +53,7 @@ class AdminPayment{
                 }else{
                     withdrawModel.findById(id, (err, withdrawal)=>{
                         if(data.approved==='false'){
-                            withdrawModel.findByIdAndUpdate(id, data, (err)=>{
+                            withdrawModel.findByIdAndUpdate(id, {pending:false}, (err)=>{
                                 if(err){
                                     res.status(203).json({success:false, message:"error updating details", err:err})
                                 }else{
@@ -62,7 +62,7 @@ class AdminPayment{
                                 }
                             })
                         }else{
-                            withdrawModel.findByIdAndUpdate(id, data, (err)=>{
+                            withdrawModel.findByIdAndUpdate(id, {pending:false}, (err)=>{
                                 if(err){
                                     res.status(203).json({success:false, message:"error updating details", err:err}) 
                                 }else{
@@ -72,7 +72,7 @@ class AdminPayment{
                                         BalanceController.updateBalace(withdrawal.user, new_balance).then(success=>{
                                             if(success==true){
                                                 res.status(200).json({success:true, message:"approval successful"})
-                                                BalanceHistory.createData(withdrawal.amount, withdrawal.user, "Withdrawal approved", "debit")
+                                                BalanceHistory.createData(withdrawal.amount, withdrawal.user, "Withdrawal to bank", "debit")
                                                 notificationModel.WithdrawalNotif("Withdrawal approved", "Your request for withdrawal has been approved", withdrawal.user)
                                                 WorkQueue.process( job => {
                                                     //queue mailing job
@@ -87,9 +87,40 @@ class AdminPayment{
                                 }
                             })
                         }
-                    }).populate('user')
+                    }).populate('user').populate('bank')
                 }
             })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    topUp(req, res){
+        var data={
+            amount:req.body.amount
+        }
+        var id={_id:req.params.id}
+        try{
+                auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                    if(admin==null){
+                        res.status(203).json({success:false, message:"unauthorized to accesss endpoint"})
+                    }else{
+                        userModel.findById(id, (err, user_details)=>{
+
+                        BalanceController.getBalance(user_details).then(balance=>{
+                            var new_balance=(balance.balance + parseFloat(data.amount)).toFixed(2)
+                            BalanceController.updateBalace(user_details, new_balance).then(success=>{
+                                if(success==true){
+                                    res.status(200).json({success:true, message:"top up successful"})
+                                    BalanceHistory.createData(data.amount, user_details, "Account top up", "credit")
+                                    notificationModel.WithdrawalNotif("Account top up", "Your account has been credited by the admin", user_details)
+                                }
+                            })
+                        });
+                    })
+                    }
+                })  
         }catch(e){
             res.status(500)
             console.log(e)
