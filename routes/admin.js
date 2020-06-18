@@ -52,5 +52,8 @@ router.get('/waybill/getcomplete', verification.verifyToken, adminWaybillControl
 router.get('/waybill/getactive', verification.verifyToken, adminWaybillController.getAllActiveWaybill)
 router.get('/waybill/getcanceled', verification.verifyToken, adminWaybillController.getAllCanceledWaybill)
 router.get('/waybill/getid/:id', verification.verifyToken, adminWaybillController.getWayBillById)
+router.get('/waybill/markasactive/:id', verification.verifyToken, adminWaybillController.MarkWaybillasActive)
+router.get('/waybill/markascomplete/:id', verification.verifyToken, adminWaybillController.MarkWaybillasComplete)
+router.get('/waybill/markascanceled/:id', verification.verifyToken, adminWaybillController.CancelWaybill)
 
 module.exports = router;
