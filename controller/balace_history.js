@@ -32,6 +32,8 @@ class BalanceHistory{
                     if(err)res.status(203).json({success:false, message:"error getting balance", err:err})
                     res.status(200).json({success:true, message:history})
                 })
+            }).catch(err=>{
+                res.status(203).json({success:false, err:err})
             })
         }catch(e){
             res.status(500)
@@ -55,6 +57,8 @@ class BalanceHistory{
                     if(err)res.status(203).json({success:false, message:"error getting balance", err:err})
                     res.status(200).json({success:true, message:history})
                 })
+            }).catch(err=>{
+                res.status(203).json({success:false, err:err})
             })
         }catch(e){
             res.status(500);

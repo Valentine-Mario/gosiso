@@ -37,6 +37,8 @@ class Card{
                 }else{
                     res.status(203).json({success:false, message:"verify account before creating card details"})
                 }   
+            }).catch(err=>{
+                res.status(203).json({success:false, err:err})
             })
         }catch(e){
             console.log(e)
@@ -58,6 +60,8 @@ class Card{
                     
                     res.status(200).json({success:true, message:card_info})
                 })
+            }).catch(err=>{
+                res.status(203).json({success:false, err:err})
             })
         }catch(e){
             res.status(500)
@@ -73,6 +77,8 @@ class Card{
                             if(err)res.status(203).json({success:false, message:"error deleting card", err:err})
                             res.status(200).json({success:true, message:"card deleted successfully"})
                         })
+                    }).catch(err=>{
+                        res.status(203).json({success:false, err:err})
                     })
         }catch(e){
             res.status(500)
@@ -109,6 +115,8 @@ class Card{
                         }
                     }
                 })
+            }).catch(err=>{
+                res.status(203).json({success:false, err:err})
             })
         }catch(e){
             res.status(500)

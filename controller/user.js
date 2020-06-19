@@ -81,6 +81,8 @@ class user{
                             if(err)res.status(203).json({success:false, message:"error approving account, try again"})
                             res.status(200).render('layout', { title: 'Gosiso', message:"Welcome to Gosiso, account verified" });
                         })
+                    }).catch(err=>{
+                        res.status(203).json({success:false, err:err})
                     })
                 }catch(e){
                     console.log(e)
@@ -157,6 +159,8 @@ class user{
                             res.status(200).json({success:true, message:user, balance:balance})
 
                         })
+                    }).catch(err=>{
+                        res.status(203).json({success:false, err:err})
                     })
                 }catch(e){
                     console.log(e);
@@ -181,7 +185,9 @@ class user{
                              res.status(200).json({success:true, message:"update successful"});
                             }                      
                          })  
-                    }) 
+                    }).catch(err=>{
+                        res.status(203).json({success:false, err:err})
+                    })
                 
                 }catch(e){
                     console.log(e)
@@ -215,6 +221,8 @@ class user{
                                 
                             }
                         })
+                        }).catch(err=>{
+                            res.status(203).json({success:false, err:err})
                         })
                 }catch(e){
                     console.log(e)
@@ -245,6 +253,8 @@ class user{
                                 res.status(203).json({success:false, message:"incorrect password"})
                             }
                         })
+                    }).catch(err=>{
+                        res.status(203).json({success:false, err:err})
                     })
                 }catch(e){
                     console.log(e)
@@ -284,6 +294,8 @@ class user{
                                 res.status(203).json({success:false, message:"incorrect password"}) 
                             }
                         })
+                    }).catch(err=>{
+                        res.status(203).json({success:false, err:err})
                     })
                 }catch(e){
                     console.log(e)
@@ -306,6 +318,8 @@ class user{
                                 res.status(200).json({success:true, message:"pics updated successfully", pics:pics_url.secure_url})
                             })
                         })
+                    }).catch(err=>{
+                        res.status(203).json({success:false, err:err})
                     })
                 }catch(e){
                     console.log(e)
@@ -332,6 +346,8 @@ class user{
                             }
                         })
                        
+                    }).catch(err=>{
+                        res.status(203).json({success:false, err:err})
                     })
                 }catch(e){
                     console.log(e)

@@ -39,6 +39,8 @@ class Bank{
                 }else{
                     res.status(203).json({success:false, message:"verify account before creating card details"})  
                 }
+            }).catch(err=>{
+                res.status(203).json({success:false, err:err})
             })
         }catch(e){
             res.status(500);
@@ -53,6 +55,8 @@ class Bank{
                     if(err)res.status(203).json({success:false, message:"error getting details", err:err})
                     res.status(200).json({success:true, message:bank_details})
                 }).populate('user')
+            }).catch(err=>{
+                res.status(203).json({success:false, err:err})
             })
         }catch(e){
             res.status(500);
@@ -95,6 +99,8 @@ class Bank{
                 }else{
                     res.status(203).json({success:false, message:"verify account before creating card details"})  
                 }
+            }).catch(err=>{
+                res.status(203).json({success:false, err:err})
             })
         }catch(e){
             res.status(500);

@@ -64,6 +64,7 @@ class auth{
     verifyTokenMail(token){
         return new Promise((resolve, reject) => {
             jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET, function(err, decodedToken) {
+              
                 if (err) {
                     reject(err);
                 } else {
