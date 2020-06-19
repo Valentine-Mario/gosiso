@@ -18,11 +18,17 @@ class Card{
                         data.user=user._id;
                         data.card_type=numberValidation.card.type
                         data.card_no=encrypt.encrypt(data.card_no)
-                        cardModel.create(data, (err, card)=>{
-                            if(err){
-                                res.status(203).json({success:false, message:"error creating card", err:err})
+                        cardModel.findOne({user:user._id}, (err, user_card)=>{
+                            if(user_card==null){
+                                cardModel.create(data, (err, card)=>{
+                                    if(err){
+                                        res.status(203).json({success:false, message:"error creating card", err:err})
+                                    }else{
+                                        res.status(200).json({success:true, message:"card added successfully"})
+                                    }
+                                })
                             }else{
-                                res.status(200).json({success:true, message:card})
+                                res.status(203).json({success:false, message:"You can only add one card at a time. Try updating card"})
                             }
                         })
                     }else{
@@ -41,13 +47,16 @@ class Card{
     getCards(req, res){
         try{
             auth_user.verifyToken(req.token).then(user=>{
-                cardModel.find({user:user.id}, (err, user_card)=>{
-                    var cards=[];
-                    for (const a of user_card) {
-                        var decrypted_value= encrypt.decrypt(a.card_no)
-                        cards.push({_id:a.id, card_no:decrypted_value, card_type:a.card_type })
+                cardModel.findOne({user:user._id}, (err, user_card)=>{
+                    var card_info={
+                        id:user_card._id,
+                        card_no:encrypt.decrypt(user_card.card_no),
+                        card_type:user_card.card_type,
+                        auth_code:user_card.auth_code,
+                        email:user_card.email
                     }
-                    res.status(200).json({success:true, message:cards})
+                    
+                    res.status(200).json({success:true, message:card_info})
                 })
             })
         }catch(e){
@@ -60,14 +69,44 @@ class Card{
         var id={_id:req.params.id}
         try{
             auth_user.verifyToken(req.token).then(user=>{
-                cardModel.findById(id, (err, card_details)=>{
-                    if(JSON.stringify(user._id)==JSON.stringify(card_details.user)){
-                        cardModel.findByIdAndDelete(id, (err)=>{
+                        cardModel.findOneAndDelete({user:user._id}, (err)=>{
                             if(err)res.status(203).json({success:false, message:"error deleting card", err:err})
                             res.status(200).json({success:true, message:"card deleted successfully"})
                         })
+                    })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
+    addNewCard(req, res){
+        var data={
+            card_no:req.body.card_no,
+            user:'',
+            card_type:''
+        }
+        try{
+            auth_user.verifyToken(req.token).then(user=>{
+                cardModel.findOneAndDelete({user:user._id}, (err)=>{
+                    if(err){
+                        res.status(203).json({success:false, message:"error deleting card", err:err})
                     }else{
-                        res.status(203).json({success:false, message:"unauthorized to delete card"})
+                        var numberValidation = valid.number(data.card_no);
+                        if(numberValidation.isValid==true){
+                            data.user=user._id;
+                            data.card_type=numberValidation.card.type
+                            data.card_no=encrypt.encrypt(data.card_no)
+                            cardModel.create(data, (err, card)=>{
+                                if(err){
+                                    res.status(203).json({success:false, message:"error creating card", err:err})
+                                }else{
+                                    res.status(200).json({success:true, message:"card added successfully"})
+                                }
+                            })
+                        }else{
+                            res.status(203).json({success:false, message:"invalid card type"})
+                        }
                     }
                 })
             })

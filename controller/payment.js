@@ -6,32 +6,61 @@ const withdrawModel=require('../models/withdrawal_request')
 const BalanceHistory=require('./balace_history')
 const CourierModel=require("../models/courier")
 const BankModel=require('../models/bank_details')
+const cardModel=require('../models/card_details')
 
 class Payment{
     addPayment(req, res){
         var data={
-            ref:req.body.ref
+            ref:req.body.ref,
+            amount:req.body.amount
         }
         try{
             auth_user.verifyToken(req.token).then(user=>{
-                payment.verifyTransaction(data.ref).then(function(response){
-                    if(response.body.data.status =='success'){
-                        BalanceController.getBalance(user).then(currennt_balance=>{
-                            var top_up=response.body.data.amount/100
-                            var new_balance=(top_up+currennt_balance.balance).toFixed(2);
-                            BalanceController.updateBalace(user, new_balance).then(success=>{
-                                if(success==true){
-                                    res.status(200).json({success:true, message:"top up successful"})
-                                    BalanceHistory.createData(top_up, user, "account top up", "credit")
-                                }else{
-                                    res.status(203).json({success:false, message:"error updating balance"})
-                                }
-                            })
-                        })
+                cardModel.findOne({user:user._id}, (err, user_card)=>{
+                    if(user_card.auth_code=="-"){
+                        payment.verifyTransaction(data.ref).then(function(response){
+                           
+                            if(response.data.status =='success'){
+                                BalanceController.getBalance(user).then(currennt_balance=>{
+                                    var top_up=response.data.amount/100
+                                    var new_balance=(top_up+currennt_balance.balance).toFixed(2);
+                                    BalanceController.updateBalace(user, new_balance).then(success=>{
+                                        if(success==true){
+                                            res.status(200).json({success:true, message:"top up successful"})
+                                            BalanceHistory.createData(top_up, user, "account top up", "credit")
+                                            cardModel.findOneAndUpdate({user:user._id}, {auth_code:response.data.authorization.authorization_code, email:response.data.customer.email}, (err)=>{})
+                                        }else{
+                                            res.status(203).json({success:false, message:"error updating balance"})
+                                        }
+                                    })
+                                })
+                            }else{
+                                res.status(203).json({success:false, message:"invalid transaction not successful"})
+                            }
+                          })
                     }else{
-                        res.status(203).json({success:false, message:"invalid transaction not successful"})
+                        var charge_amount=parseFloat(data.amount)*100
+                        payment.chargeAuth(user_card.auth_code, user_card.email, charge_amount).then((auth_res)=>{
+                            console.log(auth_res)
+                            if(auth_res.data.status =='success'){
+                                BalanceController.getBalance(user).then(currennt_balance=>{
+                                    var top_up=auth_res.data.amount/100
+                                    var new_balance=(top_up+currennt_balance.balance).toFixed(2);
+                                    BalanceController.updateBalace(user, new_balance).then(success=>{
+                                        if(success==true){
+                                            res.status(200).json({success:true, message:"top up successful"})
+                                            BalanceHistory.createData(top_up, user, "account top up", "credit")
+                                        }else{
+                                            res.status(203).json({success:false, message:"error updating balance"})
+                                        }
+                                    })
+                                })
+                            }else{
+                                res.status(203).json({success:false, message:"invalid transaction not successful"})
+                            }
+                        })
                     }
-                  })
+                })
             })
         }catch(e){
             res.status(500)

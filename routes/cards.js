@@ -5,6 +5,7 @@ var verification=require('../verification/verification')
 
 router.post('/add', verification.verifyToken, card.addCard)
 router.get('/get', verification.verifyToken, card.getCards)
-router.get('/delete/:id', verification.verifyToken, card.deleteCard)
+router.get('/delete', verification.verifyToken, card.deleteCard)
+router.post('/addnew', verification.verifyToken, card.addNewCard)
 
 module.exports = router;
