@@ -52,7 +52,7 @@ app.use(function(req, res, next) {
  app.set('views', path.join(__dirname, 'views'));
  app.set('view engine', '.hbs');
  
-var url=process.env.MONGODB_DEV
+var url=process.env.MONDODB_CLOUD
 mongoose.Promise= global.Promise;
 mongoose.connect(url, { useNewUrlParser: true }).catch((error) => { console.log(error); });
 var options = {

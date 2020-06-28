@@ -2,20 +2,19 @@
       var template=require("./mail_template")
       require('dotenv').config()
       var transporter = nodemailer.createTransport({
-          service: 'gmail',
+          host: 'smtp.mailgun.org',
+          port:587,
           auth: {
-              user: process.env.EMAIL,
-              pass: process.env.EMAIL_PASSWORD
-          }, tls: {
-              rejectUnauthorized: false
-            }
+              user: process.env.EMAIL_SERVICE,
+              pass: process.env.EMAIL_SERVICE_PASSWORD
+          }, 
       });
 
       class mailer{
           signup(email, subject, user, tempLink){
               var mailTemplate  = template.verify_mail(tempLink, user)
               var mailOptions = {
-                  from: '"Gosiso"',
+                  from: 'gosiso@mailer.gosiso.com',
                   to: email,
                   subject: subject,
                   html: `${mailTemplate}`
@@ -33,7 +32,7 @@
       onboard(email, subject, user){
         var mailTemplate  = template.onboard_mail(user)
         var mailOptions = {
-            from: '"Gosiso"',
+            from: 'gosiso@mailer.gosiso.com',
             to: email,
             subject: subject,
             html: `${mailTemplate}`
@@ -50,7 +49,7 @@
       approvecourier(email, subject, user){
         var mailTemplate  = template.approveCourier(user)
         var mailOptions = {
-            from: '"Gosiso"',
+            from: 'gosiso@mailer.gosiso.com',
             to: email,
             subject: subject,
             html: `${mailTemplate}`
@@ -68,7 +67,7 @@
                 return new Promise((resolve, reject)=>{
                   var mailTemplate  = template.forgotEmail(password)
                   var mailOptions = {
-                      from: '"Gosiso"',
+                      from: 'gosiso@mailer.gosiso.com',
                       to: email,
                       subject: "Password reset",
                       html: `${mailTemplate}`
@@ -89,7 +88,7 @@
         return new Promise((resolve, reject)=>{
           var mailTemplate  = template.successWithdrawal()
           var mailOptions = {
-              from: '"Gosiso"',
+              from: 'gosiso@mailer.gosiso.com',
               to: email,
               subject: "Withdrawal approved",
               html: `${mailTemplate}`
@@ -110,7 +109,7 @@
         return new Promise((resolve, reject)=>{
           var mailTemplate  = template.waybillDetails(waybill)
           var mailOptions = {
-              from: '"Gosiso"',
+              from: 'gosiso@mailer.gosiso.com',
               to: email,
               subject: "Waybill details",
               html: `${mailTemplate}`
@@ -131,7 +130,7 @@
         return new Promise((resolve, reject)=>{
           var mailTemplate  = template.arrivedWayBill(waybill)
           var mailOptions = {
-              from: '"Gosiso"',
+              from: 'gosiso@mailer.gosiso.com',
               to: email,
               subject: "Waybill Arrived",
               html: `${mailTemplate}`

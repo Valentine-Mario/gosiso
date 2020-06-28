@@ -1,0 +1,130 @@
+Endpoints that require token header is preceeded by an asterisk
+All admin endpoint require token header
+
+Endpoint that are paginated are preceeded by a percent symbol. Append page=page_num&limit=limit_num to enable pagination
+
+To set header, set Authorization: bearer <token>
+token is gotten after account is created or login successful.
+successful login has a status of 200 and a json body of {success:true}
+invalid token has a status of 205 and a json body of {success:false}
+login timeout has a status of 429
+error response has a status of 203 and a json body of {success:false}
+
+/user
+GET /add, create user account fields include {firstName, lastName, email, phone, password (password is min of 6 char)}
+* GET /resendverification,to resend email verififcation
+POST '/login', to login user (user has only 3 trials before timeout) required fields {email, password}
+* GET/getprofile, get user profile details
+* POST /editdetails, edit user details field include { firstName, lastName, phone}
+* POST /modifypassword, modify password fields include {old_password, password (min of 6 char)}
+*POST /deleteaccount', delete user account required field include {password}
+*POST '/updatepics', update profile picture. Required field include {pics}
+*POST '/forgotpassword' forgot password (this would reset user password and send email to user with new password) required field is {email}
+*POST '/updateemail', update user email address required fields include {email, password}
+
+
+/waybill
+this id the endpoint for user waybill
+* POST /create/:id',where /:id is the courier id selected. required fields include {images(many or one), service,pick_up, delivery,description,recipient_name, recipient_number (if recipient name and number is blank user name and number is used instead), agreed_fee}
+*POST '/usercancel/:id', cancel waybill where /:id is the waybill id required field is {reason (reason for canelation)} 
+%*GET /getcanceled', get user canceled waybill 
+%*GET '/getactive', get active waybill 
+%*GET '/getpending', get pending waybill 
+&*GET '/getcomplete', get completed waybill
+GET /get/:id, get waybill by id where /:id is the waybill id
+*POST /updatewaybill/:id, update canceled waybill required field include {service, pick_up, delivery, description, recipient_name, recipient_number, agreed_fee}
+*POST '/addpics/:id', add pics to waybill required field is {images} where /:id is waybill id
+*POST '/removepics/:id', remove pics from wayvill where /:id is the waybill id required field is {images (which is the url of the image to be removed)}
+*GET '/markascomplete/:id', mark waybill as complete where /:id is the waybill id 
+
+this part is for courier
+&*GET /courier/getpending', get pending waybill for courier
+&*GET /courier/getcanceled', get canceled waybill for courier
+&*GET /courier/getactive', get active waybill for courier
+&*GET /courier/getcomplete', get complete waybill
+*GET '/courier/approvecancel/:id', approve a pending cancel where /:id is the waybill id
+*POST /courier/disputecancel/:id', dispute pending canceled waybill where /:id is the waybill id required field include {dispute} which is the dispute message
+*POST '/courier/cancel/:id', cancel waybill where /:id is the waybill id required field include {reason} which is the reason for cancel
+*GET '/courier/accept/:id', accept waybill where /:id is the waybill id 
+*GET '/courier/markasarrived/:id', marked waybill as arrived where /:id is the waybill id
+
+
+/courier
+*POST '/apply', apply as courier required fields include {state, city, home_address, whatsapp, facebook(optional), guarantor1_name, guarantor1_number,
+guarantor1_occupation, guarantor1_relationship, guarantor2_name, guarantor2_number, guarantor2_occupation, guarantor2_relationship}
+GET '/get/:id', get courier by id where /:id
+%GET'/search/:value', search for courier
+*POST'/rate/:id', rate courier where /:id is the courier id required field include {rating}
+
+
+/bank
+*POST '/create', add bank details required fields include {account_number, bank_name, password} only one can be created at a time
+*GET '/get', get user bank details
+*POST '/change', update bank details required field include {account_number, bank_name, password} this would be approved or rejected by the admin
+
+
+/card
+*POST '/add', add card details required fields include {card_no} only one can be added at a time
+*GET '/get', get card details
+*GET '/delete', delete card details
+*POST '/addnew', add new card to overide the existing one required field include {card_no}
+
+/payment
+//unused card has auth-code set to - when card has been used once auth code is set thus no need to input card details again we charge with auth-code read up on paystack charge Authorization API//
+*POST '/add', top up balance (on first payment require field include {ref} which is the refernce code of transaction while on used card, just pass the amount in naira with the field {amount})
+*POST '/withdraw', request withdrawal from admin required field include {amount, password, suggesstion}
+
+/notif
+//unread bnotification has viewed field of false//
+*GET '/getlength', get number of unread notification
+%*GET '/get', get notification
+
+/balancehistory
+%*GET '/all', get all transaction history
+&*POST '/requesttype', get transaction history type with field {request_type} that has value debit or credit based on the type you want
+
+all admin Endpoints
+/admin
+POST '/login', admin login required field include {email, password}
+%*POST '/getcouriers', get all couriers with field {pendingApproval, verifiedCourier} set pendingApproval to true and verifiedCourier to false to get panding couriers
+set pendingApproval to false and verifiedCourier to false to get declined courier, set pendingApproval to false and verifiedCourier to true to get verified coueier
+
+*GET '/declinecourier/:id', decline courier application where /:id is the courier id
+*POST '/approvecourier/:id', approve courier where /:id is the courier id with fields {wareHouseImage(many or one pics), locationImage(only one image), verified_address}
+*POST '/editaddress/:id', edit courier address with field {verified_address} where /:id is the courier id
+*POS '/editlocationpics/:id', update courier location image where /:id the courier id with field {locationImage}
+*POST '/removewarehousepics/:id', remove image from warehouse image collection where /:id is the courier id with field {wareHouseImage(which is the image url)}
+*POST '/uploadwarehousepics/:id', upload more pics to courier warehouse image collection where /:id is the courier id required field include {wareHouseImage(one or more images)}
+%*GET '/searchcourier/:value', search courier
+%*GET '/getusers', get all users 
+*GET '/getuserid/:id', get user by id
+%*GET '/searchuser/:value', search user
+*GET '/suspendcourier/:id', suspend courier where /:id is the courier id
+*GET '/unsuspendcourier/:id', unsuspend courier where /:id is the courier id
+&*POST '/getcouriertype', get suspended or unsuspended courier with field {suspended} set field to true to get suspended courier and false for otherwise
+*POST '/edituserdetails/:id', edit user details where /:id is the user id with field { firstName, lastName, phone}
+*GET '/deleteuserdetails/:id', delete user details where /:id is the user id
+
+//bank stuff
+%*GET '/getpendingbank', get pending bank approval
+*GET '/getpendingbankbyid/:id',get pending bank by id
+%*POST '/changebankpendingstatus/:id', approve or decline pending bank where /:id is the bank id required field include {verify} set to true for success and false for otherwise
+
+//withdrawal stuffs
+%*POST '/viewwithdrawalrequest', get all withdrawal request with field {pending, approved} set pending to true and approve to false to see all pending list,
+set pending to false and approved to false to see declined request, set panding to false and approved to true to see all approved request
+*POST '/withdrawalreview/:id', review request where /:id is the waithdrawal id with fields {approved} set field to false to reject and true to accept
+*POST '/topupuser/:id', top up user where /:id is the user id with fields {amount}
+
+//waybill stuff
+%*GET '/waybill/getdispute', get all dispute waybill
+*GET '/waybill/dispute/:id', get dispute waybill by id
+%*GET '/waybill/getall', get all waybill
+%*GET '/waybill/getpending', get all pending waybill
+%*GET '/waybill/getcomplete',get all completed waybill
+%*GET '/waybill/getactive', get all active waybill
+%*GET '/waybill/getcanceled', get all canceled waybill
+*GET '/waybill/getid/:id', get waybill by id
+*GET '/waybill/markasactive/:id', mark waybill as active where /:id is the waybill id
+*GET '/waybill/markascomplete/:id', mark waybill as complete where /:id is the waybill id
+*GET '/waybill/markascanceled/:id', mark waybill as canceled where /:id is the waybill id
