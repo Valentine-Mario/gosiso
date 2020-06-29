@@ -79,7 +79,7 @@ class user{
                     auth_user.verifyTokenMail(token).then(user_value=>{
                         userModel.findByIdAndUpdate(user_value._id, data, (err)=>{
                             if(err)res.status(203).json({success:false, message:"error approving account, try again"})
-                            res.status(200).render('layout', { title: 'Gosiso', message:"Welcome to Gosiso, account verified" });
+                            res.status(200).render('welcome');
                         })
                     }).catch(err=>{
                         res.status(203).json({success:false, err:err})
