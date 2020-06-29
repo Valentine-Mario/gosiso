@@ -40,7 +40,7 @@ class user{
                                 balance.createAccount(newUser).then(acc=>{
                                     let user=newUser._id
                                     //queue job for email
-                                    WorkQueue.add({email:data.email}, { attempts: 5});
+                                    WorkQueue.add({email:data.email}, { attempts: 3});
                                     //create mail token
                                     auth_user.mailerToken({user}).then(token=>{
                                         WorkQueue.process( job => {
@@ -97,7 +97,7 @@ class user{
                     auth_user.verifyToken(req.token).then(user=>{
                         if(!user.verified){
 
-                            WorkQueue.add({email:user.email}, { attempts: 5});
+                            WorkQueue.add({email:user.email}, { attempts: 3});
                             var user=user._id
                             auth_user.mailerToken({user}).then(token=>{
                                 WorkQueue.process( job => {

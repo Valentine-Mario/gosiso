@@ -224,7 +224,7 @@ class courier_waybill{
                                             notificationController.wayBillNotification(waybill_details.user._id, "Waybill accepted", `Waybill with id ${waybill_details._id} has been accepted by the courier`,
                                             null, waybill_details._id)
                                             
-                                            WorkQueue.add({email:waybill_details.user.email}, { attempts: 5});
+                                            WorkQueue.add({email:waybill_details.user.email}, { attempts: 3});
                                             WorkQueue.process( job => {
                                                 //queue mailing job
                                                mail.acceptWaybill(job.data.email, waybill_details);
@@ -305,7 +305,7 @@ class courier_waybill{
                             if(JSON.stringify(waybill_details.courier)==JSON.stringify(courier_details._id)){
                                 notificationController.wayBillNotification(waybill_details.user._id, "Waybill arrived", `Waybill with id ${waybill_details._id} has arrived at ${waybill_details.delivery}`, null, 
                                 waybill_details._id)
-                                WorkQueue.add({email:waybill_details.user.email}, { attempts: 5});
+                                WorkQueue.add({email:waybill_details.user.email}, { attempts: 3});
                                 WorkQueue.process( job => {
                                     //queue mailing job
                                    mail.arrivedWaybill(job.data.email, waybill_details);

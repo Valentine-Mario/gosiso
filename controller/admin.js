@@ -151,7 +151,7 @@ class admin{
                     res.status(203).json({success:false, message:"unauthorized to access endpoint"})
                 }else{
                     courierModel.findById(id, (err, courier)=>{
-                        WorkQueue.add({email:courier.user.email}, { attempts: 5});
+                        WorkQueue.add({email:courier.user.email}, { attempts: 3});
                         var count=data.wareHouseImage.length
                         for(var i=0; i< data.wareHouseImage.length; i++){
                             cloud.pics_upload(data.wareHouseImage[i].path).then(val=>{

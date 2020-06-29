@@ -68,7 +68,7 @@ class AdminPayment{
                                 }else{
                                     BalanceController.getBalance(withdrawal.user).then(balance=>{
                                         var new_balance=(balance.balance - withdrawal.amount).toFixed(2)
-                                        WorkQueue.add({email:withdrawal.user.email}, { attempts: 5});
+                                        WorkQueue.add({email:withdrawal.user.email}, { attempts: 3});
                                         BalanceController.updateBalace(withdrawal.user, new_balance).then(success=>{
                                             if(success==true){
                                                 res.status(200).json({success:true, message:"approval successful"})
