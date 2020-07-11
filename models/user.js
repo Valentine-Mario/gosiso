@@ -9,7 +9,8 @@ var schema=new mongoose.Schema({
     pics:{type:String, default:"https://res.cloudinary.com/school-fleep/image/upload/v1535357797/avatar-1577909_640.png"},
     verified:{type:Boolean, default:false},
     created_at:{type:Date},
-    verifiedCourier:{type:Boolean, default:false}
+    verifiedCourier:{type:Boolean, default:false},
+    pending_application:{type:Boolean, default:false}
 
 })
 schema.plugin(mongoosePaginate);

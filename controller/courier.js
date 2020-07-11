@@ -1,7 +1,7 @@
 const courierModel=require('../models/courier');
 const auth_user=require('../helpers/auth');
 const ratingModel=require('../models/ratings')
-
+const userModel=require("../models/user")
 class Courier{
 
     applyAsCourier(req, res){
@@ -39,6 +39,7 @@ class Courier{
                                               }
                                             }else{
                                                 res.status(200).json({success:true, message:"application sent"})
+                                                userModel.findByIdAndUpdate(user_details._id, {pending_application:true}, (err)=>{})
                                             }
             
                                     })
@@ -130,6 +131,19 @@ class Courier{
             })
         }catch(e){
             res.status(500);
+            console.log(e)
+        }
+    }
+
+    getAllcourierStates(req, res){
+        try{
+            courierModel.find({suspended:false}, {pendingApproval:false}, {verifiedCourier:true}, (err, courierList)=>{
+                let states= courierList.map(a=>a.state)
+                let unique_set=new Set(states)
+                res.status(200).json({success:true, stateList:Array.from(unique_set)})
+            })
+        }catch(e){
+            res.status(500)
             console.log(e)
         }
     }

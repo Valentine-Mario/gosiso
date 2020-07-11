@@ -55,6 +55,7 @@ guarantor1_occupation, guarantor1_relationship, guarantor2_name, guarantor2_numb
 GET '/get/:id', get courier by id where /:id
 %GET'/search/:value', search for courier
 *POST'/rate/:id', rate courier where /:id is the courier id required field include {rating}
+GET '/getallstate' to get the listing of all courier states
 
 
 /bank
@@ -96,6 +97,9 @@ set pendingApproval to false and verifiedCourier to false to get declined courie
 *POST '/removewarehousepics/:id', remove image from warehouse image collection where /:id is the courier id with field {wareHouseImage(which is the image url)}
 *POST '/uploadwarehousepics/:id', upload more pics to courier warehouse image collection where /:id is the courier id required field include {wareHouseImage(one or more images)}
 %*GET '/searchcourier/:value', search courier
+*POST '/editcourierdetails/:id', update courier details where /:id is the courier id required fields include {state, city, home_address, whatsapp, facebook(optional), guarantor1_name, guarantor1_number,
+guarantor1_occupation, guarantor1_relationship, guarantor2_name, guarantor2_number, guarantor2_occupation, guarantor2_relationship}
+
 %*GET '/getusers', get all users 
 *GET '/getuserid/:id', get user by id
 %*GET '/searchuser/:value', search user

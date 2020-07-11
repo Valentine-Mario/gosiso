@@ -123,6 +123,8 @@ class admin{
                             }else{
                                 notificationModel.declineNotification(courier.user);
                                 res.status(200).json({success:true, message:"declined successful"})
+                                userModel.findByIdAndUpdate(courier.user, {pending_application:false}, (err)=>{})
+
                             }
                         })
                     }).populate('user')
@@ -175,6 +177,8 @@ class admin{
                                                     console.log(`Job completed with result`);
                                                   })
                                                 res.status(200).json({success:true, message:"application approved successfully"})
+                                                userModel.findByIdAndUpdate(courier.user, {pending_application:false}, (err)=>{})
+
                                                 })
                                             }
                                         })
@@ -370,6 +374,46 @@ class admin{
             })
         }catch(e){
             res.status(500);
+            console.log(e)
+        }
+    }
+
+    editCourierDetails(req, res){
+        var data={
+            state:req.body.state,
+            city:req.body.city,
+            home_address:req.body.home_address,
+            whatsapp:req.body.whatsapp,
+            facebook:req.body.facebook,
+            guarantor1_name:req.body.guarantor1_name,
+            guarantor1_number:req.body.guarantor1_number,
+            guarantor1_occupation:req.body.guarantor1_occupation,
+            guarantor1_relationship:req.body.guarantor1_relationship,
+            guarantor2_name:req.body.guarantor2_name,
+            guarantor2_number:req.body.guarantor2_number,
+            guarantor2_occupation:req.body.guarantor2_occupation,
+            guarantor2_relationship:req.body.guarantor2_relationship,
+        }
+        var id={_id:req.params.id}
+
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    courierModel.findByIdAndUpdate(id, data, (err, courier_details)=>{
+                        if(err){
+                            if (err.name === 'MongoError' && err.code === 11000) {
+                                res.status(203).json({success:false, message:"whatsapp number already exist"})
+                              }
+                           }else{
+                            res.status(200).json({success:true, message:"courier details updated successfully"})
+                           }
+                    })
+                }
+            })
+        }catch(e){
+            res.status(500)
             console.log(e)
         }
     }

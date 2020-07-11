@@ -35,6 +35,7 @@ router.get('/unsuspendcourier/:id', verification.verifyToken, admin.unsuspendedC
 router.post('/getcouriertype', verification.verifyToken, admin.getSuspendedOrUnsuspended)
 router.post('/edituserdetails/:id', verification.verifyToken, admin.editUserDetails)
 router.get('/deleteuserdetails/:id', verification.verifyToken, admin.deleteUserDetails)
+router.post('/editcourierdetails/:id', verification.verifyToken, admin.editCourierDetails)
 
 //bank stuff
 router.get('/getpendingbank', verification.verifyToken, pending_banks.getPendingBanks)
