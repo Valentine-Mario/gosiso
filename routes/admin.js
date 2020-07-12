@@ -19,6 +19,7 @@ var upload = multer({ storage: storage })
 
 router.post('/add', admin.makeAdmin)
 router.post('/login', admin.adminLogin)
+router.get('/get', verification.verifyToken, admin.getAdmin)
 router.post('/getcouriers', verification.verifyToken, admin.getCouriers);
 router.get('/declinecourier/:id', verification.verifyToken, admin.declineCourier)
 router.post('/approvecourier/:id', upload.any(), verification.verifyToken, admin.acceptCourier)

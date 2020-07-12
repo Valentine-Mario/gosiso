@@ -45,6 +45,21 @@ class admin{
         }
     }
 
+    getAdmin(req, res){
+        try{
+            auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    res.status(203).json({success:false, message:"unauthorized to access endpoint"})
+                }else{
+                    res.status(200).json({success:false, message:"valid admin token"})
+                }
+            })
+        }catch(e){
+            res.status(500);
+            console.log(e)
+        }
+    }
+
     adminLogin(req, res){
         var data={
             email:req.body.email,

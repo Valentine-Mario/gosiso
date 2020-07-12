@@ -87,6 +87,7 @@ GET '/getallstate' to get the listing of all courier states
 all admin Endpoints
 /admin
 POST '/login', admin login required field include {email, password}
+*GET '/get' to extra verify admin validity
 %*POST '/getcouriers', get all couriers with field {pendingApproval, verifiedCourier} set pendingApproval to true and verifiedCourier to false to get panding couriers
 set pendingApproval to false and verifiedCourier to false to get declined courier, set pendingApproval to false and verifiedCourier to true to get verified coueier
 
@@ -112,7 +113,7 @@ guarantor1_occupation, guarantor1_relationship, guarantor2_name, guarantor2_numb
 //bank stuff
 %*GET '/getpendingbank', get pending bank approval
 *GET '/getpendingbankbyid/:id',get pending bank by id
-%*POST '/changebankpendingstatus/:id', approve or decline pending bank where /:id is the bank id required field include {verify} set to true for success and false for otherwise
+*POST '/changebankpendingstatus/:id', approve or decline pending bank where /:id is the bank id required field include {verify} set to true for success and false for otherwise
 
 //withdrawal stuffs
 %*POST '/viewwithdrawalrequest', get all withdrawal request with field {pending, approved} set pending to true and approve to false to see all pending list,
