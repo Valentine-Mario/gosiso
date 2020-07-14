@@ -51,7 +51,7 @@ class admin{
                 if(admin==null){
                     res.status(203).json({success:false, message:"unauthorized to access endpoint"})
                 }else{
-                    res.status(200).json({success:false, message:"valid admin token"})
+                    res.status(200).json({success:true, message:"valid admin token"})
                 }
             })
         }catch(e){
