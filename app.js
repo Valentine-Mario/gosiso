@@ -47,9 +47,6 @@ const limiter = rateLimit({
         // CORS
         res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
         res.setHeader('Access-Control-Allow-Origin', '*');
-
-        // Send this response for rate limited requests
-        res.status(this.statusCode!).send(this.message);
       }
 });
  
