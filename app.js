@@ -32,7 +32,8 @@ const rateLimit = require("express-rate-limit");
 const limiter = rateLimit({
   windowMs: 5 * 60 * 1000, 
   max: 3 ,
-  message:"Three trials exceeded, try again after 5 minutes"
+  message:"Three trials exceeded, try again after 5 minutes",
+  statusCode:206
 });
  
 //  apply to all requests
