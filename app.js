@@ -33,7 +33,7 @@ const limiter = rateLimit({
   windowMs: 3 * 60 * 1000, 
   max: 5 ,
   message:"Three trials exceeded, try again after 5 minutes",
-  statusCode:206,
+  statusCode:201,
       handler: function (req, res, next) {
         
         res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
