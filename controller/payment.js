@@ -96,9 +96,9 @@ class Payment{
                                                 }else{
                                                             //get earnings from waybill
                                                             BalanceController.getBalanceFromWaybill(user_details).then(waybill_balance=>{
-                                                                if(waybill_balance<2000){
-                                                                    res.status(203).json({success:false, message:"total earning from waybill has to be over 2000 naira"})
-                                                                }else{
+                                                                // if(waybill_balance<2000){
+                                                                //     res.status(203).json({success:false, message:"total earning from waybill has to be over 2000 naira"})
+                                                                // }else{
                                                                     data.user=user_details._id;
                                                                     data.bank=bank._id
                                                             
@@ -107,7 +107,7 @@ class Payment{
                                                                         res.status(200).json({success:true, message:"withdrawal request sent successfully"})
                                                                     })
                                                               
-                                                                }
+                                                               // }
                                                             })
                                                         }
                                             })
