@@ -35,18 +35,12 @@ const limiter = rateLimit({
   message:"Three trials exceeded, try again after 5 minutes",
   statusCode:206,
       handler: function (req, res, next) {
-        res.removeHeader('X-Powered-By');
-        res.setHeader('X-Content-Type-Options', 'nosniff');
-        res.setHeader('X-DNS-Prefetch-Control', 'off');
-        res.setHeader('X-Download-Options', 'noopen');
-        res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-        res.setHeader('X-XSS-Protection', '1; mode=block');
-        res.setHeader('Strict-Transport-Security', 'max-age=15552000; includeSubDomains');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
+        
+        res.header('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With');
 
         // CORS
-        res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
-        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+        res.header('Access-Control-Allow-Origin', '*');
         res.status(this.statusCode).send(this.message);
       }
 });
