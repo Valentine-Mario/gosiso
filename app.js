@@ -30,8 +30,8 @@ const rateLimit = require("express-rate-limit");
  app.set('trust proxy', 1);
  
 const limiter = rateLimit({
-  windowMs: 5 * 60 * 1000, 
-  max: 3 ,
+  windowMs: 3 * 60 * 1000, 
+  max: 5 ,
   message:"Three trials exceeded, try again after 5 minutes",
   statusCode:206
 });
