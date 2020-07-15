@@ -270,7 +270,7 @@ class admin{
             populate:'user'
         }
         var data={
-            suspended:req.data.suspended
+            suspended:req.body.suspended
         }
         auth_user.verifyTokenAdmin(req.token).then(admin=>{
             if(admin==null){
