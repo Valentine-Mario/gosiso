@@ -50,8 +50,11 @@ class Card{
         try{
             auth_user.verifyToken(req.token).then(user=>{
                 cardModel.findOne({user:user._id}, (err, user_card)=>{
-                    var card_info={
-                        id:user_card._id,
+                    if(user_card==null){
+                        res.status(200).json({success:true, message:"you have no cards"})
+                    }else{
+                        var card_info={
+                        _id:user_card.id,
                         card_no:encrypt.decrypt(user_card.card_no),
                         card_type:user_card.card_type,
                         auth_code:user_card.auth_code,
@@ -59,6 +62,7 @@ class Card{
                     }
                     
                     res.status(200).json({success:true, message:card_info})
+                    }
                 })
             }).catch(err=>{
                 res.status(203).json({success:false, err:err})
