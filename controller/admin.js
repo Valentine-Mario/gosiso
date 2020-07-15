@@ -524,10 +524,10 @@ class admin{
                 if(admin==null){
                     res.status(203).json({success:false, message:"unauthorized to access endpoint"})
                 }else{
-                    userModel.paginate({$or:[{"firstName":{$regex: value, $options: 'gi'}}, {"lastName":{$regex: value, $options: 'gi'}}]}, options, (err, users=>{
+                    userModel.paginate({$or:[{"firstName":{$regex: value, $options: 'gi'}}, {"lastName":{$regex: value, $options: 'gi'}}]}, options, (err, users)=>{
                         if(err)res.status(203).json({success:false, message:"error getting users", err:err})
                         res.status(200).json({success:true, message:users})
-                    }))
+                    })
                 }
             })
         }catch(e){
