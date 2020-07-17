@@ -289,27 +289,27 @@ class user{
                                                     courierModel.findOneAndDelete({user:user._id}, (err)=>{
                                                         res.status(200).json({success:true, message:"account deleted successfully"})
                                                         courierModel.find({user:user._id}, (err, courier)=>{
-                                                                for(a of courier){
+                                                                for(var a of courier){
                                                                     courierModel.findByIdAndDelete(a._id, (err)=>{})
                                                                 }
                                                             })
                                                             withdrawModel.find({user:user._id}, (err, withdrawal)=>{
-                                                                for(a of withdrawal){
+                                                                for(var a of withdrawal){
                                                                     withdrawModel.findByIdAndDelete(a._id, (err)=>{})
                                                                 }
                                                             })
                                                             waybillModel.find({user:user._id}, (err, waybill)=>{
-                                                                for(a of waybill){
+                                                                for(var a of waybill){
                                                                     waybillModel.findByIdAndDelete(a._id, (err)=>{})
                                                                 }
                                                             })
                                                             disputeModel.find({user:user._id}, (err, dispute)=>{
-                                                                for(a of dispute){
+                                                                for(var a of dispute){
                                                                     disputeModel.findByIdAndDelete(a._id, err=>{})
                                                                 }
                                                             })
                                                             bank_pending.find({user:user._id}, (err, pending)=>{
-                                                                for(a of pending){
+                                                                for(var a of pending){
                                                                     bank_pending.findByIdAndDelete(a._id, err=>{})
                                                                 }
                                                             })
