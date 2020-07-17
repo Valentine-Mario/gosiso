@@ -320,7 +320,7 @@ class admin{
                         data.locationImage=location_pics.secure_url;
                         courierModel.findByIdAndUpdate(id, data, (err)=>{
                             if(err)res.status(203).json({success:false, message:"error editing pics", err:err})
-                            res.status(200).json({success:true, message:"image updated successfully"})
+                            res.status(200).json({success:true, message:"image updated successfully", img:location_pics.secure_url})
                         })
                     })
                 }
