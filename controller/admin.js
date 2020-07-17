@@ -11,6 +11,11 @@ const WorkQueue = new Queue('email', REDIS_URL);
 const userModel=require('../models/user')
 const balanceController=require('./balance')
 const BankModel=require('../models/bank_details')
+const withdrawModel=require('../models/withdrawal_request')
+const waybillModel = require('../models/waybill')
+const disputeModel=require('../models/dispute')
+const bank_pending=require('../models/bank_pending_approval');
+
 class admin{
 
     makeAdmin(req, res){
@@ -573,8 +578,38 @@ class admin{
                     res.status(203).json({success:false, message:"unauthorized to access endpoint"})
                 }else{
                     userModel.findByIdAndDelete(id, (err)=>{
-                        if(err)res.status(203).json({success:false, message:"error deleting user details", err:err})
-                        res.status(200).json({success:true, message:"user details deleted successfully"})
+                        if(err){
+                            res.status(203).json({success:false, message:"error deleting user details", err:err})
+                        }else{
+
+                            res.status(200).json({success:true, message:"user details deleted successfully"})
+                            courierModel.find({user:id}, (err, courier)=>{
+                                for(a of courier){
+                                    courierModel.findByIdAndDelete(a._id, (err)=>{})
+                                }
+                            })
+                            withdrawModel.find({user:id}, (err, withdrawal)=>{
+                                for(a of withdrawal){
+                                    withdrawModel.findByIdAndDelete(a._id, (err)=>{})
+                                }
+                            })
+                            waybillModel.find({user:id}, (err, waybill)=>{
+                                for(a of waybill){
+                                    waybillModel.findByIdAndDelete(a._id, (err)=>{})
+                                }
+                            })
+                            disputeModel.find({user:id}, (err, dispute)=>{
+                                for(a of dispute){
+                                    disputeModel.findByIdAndDelete(a._id, err=>{})
+                                }
+                            })
+                            bank_pending.find({user:id}, (err, pending)=>{
+                                for(a of pending){
+                                    bank_pending.findByIdAndDelete(a._id, err=>{})
+                                }
+                            })
+
+                        }
                     })
                 }
             })
