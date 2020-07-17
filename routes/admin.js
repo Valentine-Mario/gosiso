@@ -60,5 +60,6 @@ router.get('/waybill/getid/:id', verification.verifyToken, adminWaybillControlle
 router.get('/waybill/markasactive/:id', verification.verifyToken, adminWaybillController.MarkWaybillasActive)
 router.get('/waybill/markascomplete/:id', verification.verifyToken, adminWaybillController.MarkWaybillasComplete)
 router.get('/waybill/markascanceled/:id', verification.verifyToken, adminWaybillController.CancelWaybill)
+router.get('/dispute/delete/:id', verification.verifyToken, adminWaybillController.deleteDispute)
 
 module.exports = router;

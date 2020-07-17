@@ -76,6 +76,21 @@ class DisputeWaybill{
         }
     }
 
+deleteDispute(req, res){
+            var id={_id:req.params.id}
+            try{
+                auth_user.verifyTokenAdmin(req.token).then(admin=>{
+                if(admin==null){
+                    //do nothing
+                }else{
+                   disputeModel.findByIdAndDelete(id, (err)=>{}) 
+                }
+            })
+            }catch(e){
+                res.status(500)
+                console.log(e)
+            }
+}
     getAllWaybill(req, res){
         var {page, limit}= req.query;
         var options={
