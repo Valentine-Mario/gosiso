@@ -189,7 +189,7 @@ class DisputeWaybill{
                 if(admin==null){
                     res.status(203).json({success:false, message:"unauthorized to access endpoint"})
                 }else{
-                    waybillModel.paginate({$and:[{complete:true}, {pending:false}, {accepted:true}]}, options, (err, waybills)=>{
+                    waybillModel.paginate({$and:[{complete:true}, {pending:false}]}, options, (err, waybills)=>{
                         if(err)res.status(203).json({success:false, message:"error getting waybills", err:err})
                         res.status(200).json({success:true, message:waybills})
                     })
