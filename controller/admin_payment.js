@@ -62,7 +62,7 @@ class AdminPayment{
                                 }
                             })
                         }else{
-                            withdrawModel.findByIdAndUpdate(id, {pending:false}, (err)=>{
+                            withdrawModel.findByIdAndUpdate(id, {pending:false, approved:true}, (err)=>{
                                 if(err){
                                     res.status(203).json({success:false, message:"error updating details", err:err}) 
                                 }else{
