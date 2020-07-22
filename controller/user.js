@@ -14,6 +14,10 @@ const withdrawModel=require('../models/withdrawal_request')
 const waybillModel = require('../models/waybill')
 const disputeModel=require('../models/dispute')
 const bank_pending=require('../models/bank_pending_approval');
+const historyModel=require('../models/balance_history');
+const notificationModel=require('../models/notification')
+const cardModel=require('../models/card_details')
+
 class user{
     createAcc(req, res){
         var data={
@@ -311,6 +315,22 @@ class user{
                                                             bank_pending.find({user:user._id}, (err, pending)=>{
                                                                 for(var a of pending){
                                                                     bank_pending.findByIdAndDelete(a._id, err=>{})
+                                                                }
+                                                            })
+
+                                                            historyModel.find({user:user._id}, (err, history)=>{
+                                                                for(var a of history){
+                                                                    historyModel.findByIdAndDelete(a._id, err=>{})
+                                                                }
+                                                            })
+                                                            notificationModel.find({user:user._id}, (err, notif)=>{
+                                                                for(var a of notif){
+                                                                    notificationModel.findByIdAndDelete(a._id, err=>{})
+                                                                }
+                                                            })
+                                                            cardModel.find({user:user._id}, (err, cards)=>{
+                                                                for(var a of cards){
+                                                                    cardModel.findByIdAndDelete(a._id, err=>{})
                                                                 }
                                                             })
                                                     })
