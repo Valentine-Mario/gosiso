@@ -243,7 +243,7 @@ class Waybill{
             waybillModel.findById(id, (err, waybill)=>{
                 if(err)res.status(203).json({success:false, message:"error getting waybill", err:err})
                 res.status(200).json({success:true, message:waybill})
-            }).populate("courier")
+            }).populate({path:'courier', populate: { path: 'user' }})
         }catch(e){
             res.status(500)
             console.log(e)
