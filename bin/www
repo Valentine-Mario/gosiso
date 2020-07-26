@@ -8,7 +8,7 @@ var app = require('../app');
 var cluster = require('cluster');
 var debug = require('debug')('gosiso:server');
 var http = require('http');
-const WORKERS = process.env.WEB_CONCURRENCY || 1;
+const WORKERS = process.env.WEB_CONCURRENCY || 2;
 var fs=require('fs')
 /**
  * Get port from environment and store in Express.

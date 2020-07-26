@@ -16,7 +16,6 @@ const waybillModel = require('../models/waybill')
 const disputeModel=require('../models/dispute')
 const bank_pending=require('../models/bank_pending_approval');
 const historyModel=require('../models/balance_history');
-const notificationModel=require('../models/notification')
 const cardModel=require('../models/card_details')
 
 class admin{
