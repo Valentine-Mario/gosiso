@@ -137,9 +137,10 @@ class Courier{
 
     getAllcourierStates(req, res){
         try{
-            courierModel.find({suspended:false}, {pendingApproval:false}, {verifiedCourier:true}, (err, courierList)=>{
+            courierModel.find({$and:[{verifiedCourier:true}, {suspended:false}]}, (err, courierList)=>{
                 let states= courierList.map(a=>a.state)
                 let unique_set=new Set(states)
+
                 res.status(200).json({success:true, stateList:Array.from(unique_set)})
             })
         }catch(e){
