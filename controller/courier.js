@@ -161,7 +161,7 @@ class Courier{
 
     getAllcourierStates(req, res){
         try{
-            courierModel.find({$and:[{verifiedCourier:true}, {available:true}, {suspended:false}]}, (err, courierList)=>{
+            courierModel.find({$and:[{verifiedCourier:true}, {suspended:false}]}, (err, courierList)=>{
                 let states= courierList.map(a=>a.state)
                 let unique_set=new Set(states)
 
