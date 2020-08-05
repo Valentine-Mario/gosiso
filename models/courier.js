@@ -22,7 +22,8 @@ var schema=new mongoose.Schema({
     wareHouseImage:[String],
     locationImage:{type:String},
     verified_address:{type:String},
-    suspended:{type:Boolean, default:false}
+    suspended:{type:Boolean, default:false},
+    available:{type:Boolean, default:true}
 })
 schema.plugin(mongoosePaginate);
 module.exports= mongoose.model('courier', schema);

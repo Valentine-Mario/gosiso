@@ -61,6 +61,23 @@ class Courier{
         }
     }
 
+    setAvailableState(req, res){
+        var data={
+            available:req.body.available
+        }
+        try{
+            auth_user.verifyToken(req.token).then(user_details=>{
+                courierModel.findByIdAndUpdate({user:user_details._id}, {available:data.available}, (err)=>{
+                    if(err)res.status(203).json({success:false, message:"error updating available state", err:err})
+                    res.status(200).json({success:true, message:"updated availablity state successfully"}) 
+                })
+            })
+        }catch(e){
+            res.status(500)
+            console.log(e)
+        }
+    }
+
     getCourierById(req, res){
         var id={_id:req.params.id}
         try{
@@ -85,7 +102,7 @@ class Courier{
                 populate:'user'
             }
         try{
-            courierModel.paginate({$and:[{"state":{$regex: value, $options: 'gi'}},{suspended:false}, {pendingApproval:false}, {verifiedCourier:true}]}, options, (err, couriers)=>{
+            courierModel.paginate({$and:[{"state":{$regex: value, $options: 'gi'}},{suspended:false}, {available:true}, {pendingApproval:false}, {verifiedCourier:true}]}, options, (err, couriers)=>{
                 if(err)res.status(203).json({success:false, message:"error searching courier", err:err})
                 res.status(200).json({success:true, message:couriers})
             })
@@ -137,7 +154,7 @@ class Courier{
 
     getAllcourierStates(req, res){
         try{
-            courierModel.find({$and:[{verifiedCourier:true}, {suspended:false}]}, (err, courierList)=>{
+            courierModel.find({$and:[{verifiedCourier:true}, {available:true}, {suspended:false}]}, (err, courierList)=>{
                 let states= courierList.map(a=>a.state)
                 let unique_set=new Set(states)
 
