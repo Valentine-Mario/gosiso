@@ -63,7 +63,7 @@ class Payment{
                     }
                 })
                 }else{
-                    res.status(203).json({success:false, message:"verify email before topup"})
+                    res.status(203).json({success:false, message:"verify email before top up"})
                 }
             })
         }catch(e){

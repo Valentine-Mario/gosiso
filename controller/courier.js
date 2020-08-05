@@ -67,9 +67,16 @@ class Courier{
         }
         try{
             auth_user.verifyToken(req.token).then(user_details=>{
-                courierModel.findByIdAndUpdate({user:user_details._id}, {available:data.available}, (err)=>{
-                    if(err)res.status(203).json({success:false, message:"error updating available state", err:err})
-                    res.status(200).json({success:true, message:"updated availablity state successfully"}) 
+                courierModel.findOne({$and:[{user:user_details._id}, {verifiedCourier:true}]}, (err, courier)=>{
+                    if(courier==null){
+                        res.status(203).json({success:false, message:"not a verified courier"})
+                    }else{
+                    courierModel.findByIdAndUpdate(courier._id, {available:data.available}, (err)=>{
+                        if(err)res.status(203).json({success:false, message:"error updating available state", err:err})
+                        res.status(200).json({success:true, message:"updated availablity state successfully"}) 
+                })
+
+                    }
                 })
             })
         }catch(e){
