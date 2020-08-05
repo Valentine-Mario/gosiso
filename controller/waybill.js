@@ -31,8 +31,8 @@ class Waybill{
                    res.status(203).json({success:false, message:"verify email before sending waybill"})
                }else{
                 courierModel.findById(id, (err, courier_details)=>{
-                    if(courier_details.suspended==true){
-                        res.status(203).json({success:false, message:"cannot book suspended courier"})
+                    if(courier_details.suspended==true || courier_details.available==false){
+                        res.status(203).json({success:false, message:"courier seems to be suspended or isn't available to take orders now"})
                     }else{
                         if(JSON.stringify(courier_details.user._id)==JSON.stringify(user_details._id)){
                             res.status(203).json({success:false, message:"can't send waybill to yourself"})
