@@ -16,7 +16,8 @@ class Payment{
         }
         try{
             auth_user.verifyToken(req.token).then(user=>{
-                cardModel.findOne({user:user._id}, (err, user_card)=>{
+                if(user.verified){
+                    cardModel.findOne({user:user._id}, (err, user_card)=>{
                     if(user_card.auth_code=="-"){
                         payment.verifyTransaction(data.ref).then(function(response){
                            
@@ -61,6 +62,9 @@ class Payment{
                         })
                     }
                 })
+                }else{
+                    res.status(203).json({success:false, message:"verify email before topup"})
+                }
             })
         }catch(e){
             res.status(500)

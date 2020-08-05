@@ -56,7 +56,7 @@ GET '/get/:id', get courier by id where /:id
 %GET'/search/:value', search for courier
 *POST'/rate/:id', rate courier where /:id is the courier id required field include {rating}
 GET '/getallstate' to get the listing of all courier states
-
+*POST '/setavailablestate' to set availability. Required field include {available} set true to set as available and false otherwise 
 
 /bank
 *POST '/create', add bank details required fields include {account_number, bank_name, password} only one can be created at a time
