@@ -112,7 +112,7 @@ class Waybill{
                         res.status(203).json({success:false, message:"unaithorized to edit this waybill"})
                     }else{
                         if(waybill.accepted==true){
-                            waybillModel.findByIdAndUpdate(id, {canceled:true, accepted:false}, (err)=>{
+                            waybillModel.findByIdAndUpdate(id, {canceled:true, accepted:false, pending:true}, (err)=>{
                                 if(err){
                                     res.status(203).json({success:false, message:"error canceling waybill"})
                                 }else{
