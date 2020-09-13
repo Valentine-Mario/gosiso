@@ -109,9 +109,17 @@ class Courier{
                 populate:'user'
             }
         try{
-            courierModel.paginate({$and:[{"state":{$regex: value, $options: 'gi'}},{suspended:false}, {available:true}, {pendingApproval:false}, {verifiedCourier:true}]}, options, (err, couriers)=>{
-                if(err)res.status(203).json({success:false, message:"error searching courier", err:err})
-                res.status(200).json({success:true, message:couriers})
+            auth_user.verifyToken(req.token).then(user=>{
+                courierModel.paginate({$and:[{"state":{$regex: value, $options: 'gi'}},{suspended:false}, {available:true}, {pendingApproval:false}, {verifiedCourier:true}]}, options, (err, couriers)=>{
+                if(err){
+                    res.status(203).json({success:false, message:"error searching courier", err:err})
+                }else{
+                    var courier_list=couriers.docs.filter(list=>{list.user!==user._id})
+                    delete couriers["docs"]
+                    var courier={...couriers, docs:courier_list}
+                    res.status(200).json({success:true, message:courier})
+                }
+            })
             })
         }catch(e){
             res.status(500);
