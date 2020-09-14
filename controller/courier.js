@@ -115,7 +115,7 @@ class Courier{
                 if(err){
                     res.status(203).json({success:false, message:"error searching courier", err:err})
                 }else{
-                    console.log(ouriers.docs.filter(list=>{list.user._id}))
+                    console.log(couriers.docs.filter(list=>{list.user._id}))
                     var courier_list=couriers.docs.filter(list=>{list.user._id!==user._id})
                    
                     delete couriers["docs"]
