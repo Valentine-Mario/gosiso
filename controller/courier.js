@@ -116,10 +116,8 @@ class Courier{
                     res.status(203).json({success:false, message:"error searching courier", err:err})
                 }else{
                    for(var a of couriers.docs){
-                    console.log(a)
-                    console.log(a.user)
-                    console.log(a.user.id)
-                    console.log(a.user._id)
+                    console.log(a.user._id===user._id)
+                    console.log(a.user._id!==user._id)
                    }
                     var courier_list=couriers.docs.filter(list=>{list.user._id!==user._id})
                    
