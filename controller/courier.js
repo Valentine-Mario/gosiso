@@ -115,7 +115,7 @@ class Courier{
                 if(err){
                     res.status(203).json({success:false, message:"error searching courier", err:err})
                 }else{
-                    res.status(200).json({success:true, message:courier})
+                    res.status(200).json({success:true, message:couriers})
                 }
             })
             })
