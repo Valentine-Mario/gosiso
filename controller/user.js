@@ -391,7 +391,7 @@ class user{
                     hasher.hash_password(new_password).then(pass_value=>{
                         mail.forgotPassword(data.email, new_password).then(email_status=>{
                             
-                                userModel.findOneAndUpdate({email:data.email}, {password:pass_value}, (err)=>{
+                                userModel.findOneAndUpdate({"email":{$regex: data.email, $options: 'i'}}, {password:pass_value}, (err)=>{
                                     if(err)res.status(203).json({success:false, message:"error updating password", err:err})
                                     res.status(200).json({success:true, message:"new password sent to your email"})
                                 })
