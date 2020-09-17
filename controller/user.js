@@ -136,7 +136,7 @@ class user{
                     password:req.body.password
                 }
                 try{
-                    userModel.findOne({email:data.email}, (err, user)=>{
+                    userModel.findOne({"email":{$regex: data.email, $options: 'i'}}, (err, user)=>{
                     if(user!==null){
                         hasher.compare_password(data.password, user.password).then(value=>{   
                             if(value){
@@ -390,14 +390,12 @@ class user{
                 try{
                     hasher.hash_password(new_password).then(pass_value=>{
                         mail.forgotPassword(data.email, new_password).then(email_status=>{
-                            if(email_status){
+                            
                                 userModel.findOneAndUpdate({email:data.email}, {password:pass_value}, (err)=>{
                                     if(err)res.status(203).json({success:false, message:"error updating password", err:err})
                                     res.status(200).json({success:true, message:"new password sent to your email"})
                                 })
-                            }else{
-                                res.status(203).json({success:false, message:"error sending email. password failed to reset"})
-                            }
+                            
                         })
                        
                     }).catch(err=>{
