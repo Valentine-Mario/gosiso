@@ -388,10 +388,11 @@ class user{
                 var new_password=Math.random().toString(36).substring(2);
 
                 try{
-                    hasher.hash_password(new_password).then(pass_value=>{
+                    userModel.findOne({"email":{$regex: data.email, $options: 'i'}}, (err, user)=>{
+                        hasher.hash_password(new_password).then(pass_value=>{
                         mail.forgotPassword(data.email, new_password).then(email_status=>{
                             
-                                userModel.findOneAndUpdate({"email":{$regex: data.email, $options: 'i'}}, {password:pass_value}, (err)=>{
+                                userModel.findByIdAndUpdate(user._id, {password:pass_value}, (err)=>{
                                     if(err)res.status(203).json({success:false, message:"error updating password", err:err})
                                     res.status(200).json({success:true, message:"new password sent to your email"})
                                 })
@@ -400,6 +401,7 @@ class user{
                        
                     }).catch(err=>{
                         res.status(203).json({success:false, err:err})
+                    })
                     })
                 }catch(e){
                     console.log(e)
