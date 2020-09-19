@@ -17,6 +17,7 @@ const bank_pending=require('../models/bank_pending_approval');
 const historyModel=require('../models/balance_history');
 const notificationModel=require('../models/notification')
 const cardModel=require('../models/card_details')
+const jwt=require('jsonwebtoken')
 
 class user{
     createAcc(req, res){
@@ -44,6 +45,7 @@ class user{
                                }else{
                                    //create notification
                                 notification.welcomeNotification(newUser);
+                                notification.CourierAlert(newUser);
                                 //create account balance
                                 balance.createAccount(newUser).then(acc=>{
                                     let user=newUser._id
@@ -137,6 +139,7 @@ class user{
                 }
                 try{
                     userModel.findOne({"email":{$regex: data.email, $options: 'i'}}, (err, user)=>{
+
                     if(user!==null){
                         hasher.compare_password(data.password, user.password).then(value=>{   
                             if(value){
@@ -385,28 +388,56 @@ class user{
                 var data={
                     email:req.body.email
                 }
-                var new_password=Math.random().toString(36).substring(2);
+               
 
                 try{
-                    userModel.findOne({"email":{$regex: data.email, $options: 'i'}}, (err, user)=>{
-                        hasher.hash_password(new_password).then(pass_value=>{
-                        mail.forgotPassword(data.email, new_password).then(email_status=>{
-                            
-                                userModel.findByIdAndUpdate(user._id, {password:pass_value}, (err)=>{
-                                    if(err)res.status(203).json({success:false, message:"error updating password", err:err})
-                                    res.status(200).json({success:true, message:"new password sent to your email"})
-                                })
-                            
+                    userModel.findOne({"email":{$regex: data.email, $options: 'i'}}, (err, Current_user)=>{
+                        let user=Current_user._id
+                        WorkQueue.add({email:data.email}, { attempts: 3});
+                        auth_user.createTokenResetPassword({user}).then(token=>{
+                        WorkQueue.process( job => {
+                        //queue mailing job
+                         mail.forgotPassword(data.email, token);
+                        WorkQueue.on('completed', (job, result) => {
+                            console.log(`Job completed with result`);
+                          })   
                         })
-                       
-                    }).catch(err=>{
-                        res.status(203).json({success:false, err:err})
+                        res.status(200).json({success:true, message:"email reset link sent"})
                     })
-                    })
+                })
                 }catch(e){
                     console.log(e)
                     res.status(500)
                 }
+            }
+
+            resetLink(req, res){
+                        res.render('reset', {token:req.query.token})
+            }
+
+            resetingPassword(req, res){
+                 var token= req.query.token;
+                var data={
+                    password:req.body.password,
+                }
+
+                jwt.verify(token, process.env.JWT_SECRET, (err, decoded_token)=>{
+                    if(data.password.length<6){
+                    res.status(203).send("passsword must be at least 6 charcters")
+                }else{
+                        hasher.hash_password(data.password).then(hashed=>{
+                        data.password=hashed
+                        userModel.findByIdAndUpdate(decoded_token.user, data, (err, user)=>{
+                            if(err) {
+                                res.status(401).send("error reseting password")
+                            }else{
+                                res.status(200).json({success:true, message:"password reset succesful"})
+                            }
+
+                        })
+                    })
+                }
+                })
             }
 }
 module.exports=new user()

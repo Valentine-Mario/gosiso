@@ -24,5 +24,6 @@ router.post('/deleteaccount', verification.verifyToken, userController.deleteAcc
 router.post('/updatepics', upload.any(), verification.verifyToken, userController.updatePics)
 router.post('/forgotpassword', userController.forgotPassword);
 router.post('/updateemail', verification.verifyToken, userController.updateEmail)
-
+router.get("/resetlink", userController.resetLink)
+router.post("/resetpassword", userController.resetingPassword)
 module.exports = router;

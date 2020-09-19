@@ -63,9 +63,9 @@
           });
       }
 
-      forgotPassword(email, password){
+      forgotPassword(email, token){
                 return new Promise((resolve, reject)=>{
-                  var mailTemplate  = template.forgotEmail(password)
+                  var mailTemplate  = template.forgotEmail(token)
                   var mailOptions = {
                       from: 'gosiso@mailer.gosiso.com',
                       to: email,
