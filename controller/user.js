@@ -424,7 +424,10 @@ class user{
                 }
 
                 jwt.verify(token, process.env.JWT_SECRET, (err, decoded_token)=>{
-                    if(data.password.length<6){
+                    if(err){
+                        res.status(205).json({success:false, message:"token expired"})
+                    }else{
+                         if(data.password.length<6){
                     res.status(203).send("passsword must be at least 6 charcters")
                 }else{
                         hasher.hash_password(data.password).then(hashed=>{
@@ -439,6 +442,8 @@ class user{
                         })
                     })
                 }
+                    }
+                   
                 })
             }
 }
