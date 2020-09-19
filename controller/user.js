@@ -397,7 +397,9 @@ class user{
                         auth_user.createTokenResetPassword({user}).then(token=>{
                         WorkQueue.process( job => {
                         //queue mailing job
-                         mail.forgotPassword(data.email, token);
+                         mail.forgotPassword(data.email, token).then(email_status=>{
+                            console.log(email_status)
+                         });
                         WorkQueue.on('completed', (job, result) => {
                             console.log(`Job completed with result`);
                           })   
