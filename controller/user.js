@@ -138,7 +138,7 @@ class user{
                     password:req.body.password
                 }
                 try{
-                    userModel.findOne({"email":{$regex: data.email, $options: 'gi'}}, (err, user)=>{
+                    userModel.findOne({"email":{$regex: data.email.trim(), $options: 'i'}}, (err, user)=>{
 
                     if(user!==null){
                         hasher.compare_password(data.password, user.password).then(value=>{   
@@ -391,7 +391,7 @@ class user{
                
 
                 try{
-                    userModel.findOne({"email":{$regex: data.email, $options: 'gi'}}, (err, Current_user)=>{
+                    userModel.findOne({"email":{$regex: data.email.trim(), $options: 'i'}}, (err, Current_user)=>{
                         let user=Current_user._id
                         WorkQueue.add({email:data.email}, { attempts: 3});
                         auth_user.createTokenResetPassword({user}).then(token=>{
