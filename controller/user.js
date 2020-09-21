@@ -38,7 +38,7 @@ class user{
                         userModel.create(data, (err, newUser)=>{
                             if(err){
                                 if (err.name === 'MongoError' && err.code === 11000) {
-                                    res.status(203).json({ sucess: false, message:"email or number already exist"})
+                                    res.status(203).json({ success: false, message:"email or number already exist"})
                                   }else{
                                       res.status(203).json({success:false, message:err})
                                   }
