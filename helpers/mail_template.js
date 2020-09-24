@@ -1,6 +1,6 @@
-class mail_template{
-    verify_mail(token, name){
-        var template=`
+class mail_template {
+  verify_mail(token, name) {
+    var template = `
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
         <head>
@@ -295,12 +295,12 @@ class mail_template{
         </table>
         </body>
         </html>
-        `
-        return template
-    }
+        `;
+    return template;
+  }
 
-    onboard_mail(name){
-        var template=`
+  onboard_mail(name) {
+    var template = `
 
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -596,12 +596,12 @@ class mail_template{
           </tr>
         </table>
         </body>
-        </html>`
-        return template
-    }
+        </html>`;
+    return template;
+  }
 
-    approveCourier(name){
-        var template=`
+  approveCourier(name) {
+    var template = `
         
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -921,12 +921,12 @@ class mail_template{
           </tr>
         </table>
         </body>
-        </html>`
-        return template
-    }
+        </html>`;
+    return template;
+  }
 
-    forgotEmail(token){
-        var template=`
+  forgotEmail(token) {
+    var template = `
         
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -1219,12 +1219,12 @@ class mail_template{
         </table>
         </body>
         </html>
-        `
-        return template
-    }
+        `;
+    return template;
+  }
 
-    successWithdrawal(){
-        var template=`
+  successWithdrawal() {
+    var template = `
         
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -1514,12 +1514,12 @@ class mail_template{
           </tr>
         </table>
         </body>
-        </html>`
-        return template
-    }
+        </html>`;
+    return template;
+  }
 
-    arrivedWayBill(waybill){
-        var template=`
+  arrivedWayBill(waybill) {
+    var template = `
         
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -1810,12 +1810,12 @@ class mail_template{
         </table>
         </body>
         </html>
-    `
-        return template
-    }
+    `;
+    return template;
+  }
 
-    waybillDetails(waybill){
-        var template=`
+  waybillDetails(waybill) {
+    var template = `
         
         <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
         <html xmlns="http://www.w3.org/1999/xhtml">
@@ -2115,9 +2115,8 @@ class mail_template{
         </table>
         </body>
         </html>
-`
-        return template
-    }
-    
+`;
+    return template;
+  }
 }
-module.exports=new mail_template()
+module.exports = new mail_template();

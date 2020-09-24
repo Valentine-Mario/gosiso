@@ -1,83 +1,79 @@
-require('dotenv').config()
-let APIKEY = process.env.APIKEY_PAY
-var https = require('https');
+require("dotenv").config();
+let APIKEY = process.env.APIKEY_PAY;
+var https = require("https");
 
-   
-  class Paystack_class{
-   verifyTransaction(ref){
-    return new Promise((resolve, reject)=>{
-        
+class Paystack_class {
+  verifyTransaction(ref) {
+    return new Promise((resolve, reject) => {
+      var options = {
+        method: "GET",
+        hostname: "api.paystack.co",
+        path: `/transaction/verify/${ref}`,
+        headers: {
+          Authorization: `Bearer ${process.env.APIKEY_PAY}`,
+        },
+      };
 
-            var options = {
-            'method': 'GET',
-            'hostname': 'api.paystack.co',
-            'path': `/transaction/verify/${ref}`,
-            'headers': {
-                'Authorization': `Bearer ${process.env.APIKEY_PAY}`
-            }
-                    };
+      var req = https.request(options, function (res) {
+        var chunks = [];
 
-            var req = https.request(options, function (res) {
-            var chunks = [];
+        res.on("data", function (chunk) {
+          chunks.push(chunk);
+        });
 
-            res.on("data", function (chunk) {
-                chunks.push(chunk);
-            });
+        res.on("end", function (chunk) {
+          var body = Buffer.concat(chunks);
+          resolve(JSON.parse(body.toString()));
+        });
 
-            res.on("end", function (chunk) {
-                var body = Buffer.concat(chunks);
-                resolve(JSON.parse(body.toString()));
-            });
+        res.on("error", function (error) {
+          reject(error);
+        });
+      });
 
-            res.on("error", function (error) {
-               reject(error);
-            });
-            });
+      req.end();
+    });
+  }
 
-            req.end();
-    })
- }
+  chargeAuth(auth_code, email, amount) {
+    return new Promise((resolve, reject) => {
+      var options = {
+        method: "POST",
+        hostname: "api.paystack.co",
+        path: "/transaction/charge_authorization",
+        headers: {
+          Authorization: `Bearer ${process.env.APIKEY_PAY}`,
+          "Content-Type": "application/json",
+        },
+      };
 
- chargeAuth(auth_code, email, amount){
-     return new Promise((resolve, reject)=>{
+      var req = https.request(options, function (res) {
+        var chunks = [];
 
-            var options = {
-            'method': 'POST',
-            'hostname': 'api.paystack.co',
-            'path': '/transaction/charge_authorization',
-            'headers': {
-                'Authorization': `Bearer ${process.env.APIKEY_PAY}`,
-                'Content-Type': 'application/json'
-            }
-                    };
+        res.on("data", function (chunk) {
+          chunks.push(chunk);
+        });
 
-            var req = https.request(options, function (res) {
-            var chunks = [];
+        res.on("end", function (chunk) {
+          var body = Buffer.concat(chunks);
+          resolve(JSON.parse(body.toString()));
+        });
 
-            res.on("data", function (chunk) {
-                chunks.push(chunk);
-            });
+        res.on("error", function (error) {
+          reject(error);
+        });
+      });
 
-            res.on("end", function (chunk) {
-                var body = Buffer.concat(chunks);
-                resolve(JSON.parse(body.toString()));
-            });
+      var postData = JSON.stringify({
+        authorization_code: auth_code,
+        email: email,
+        amount: amount,
+      });
 
-            res.on("error", function (error) {
-                reject(error);
-            });
-            });
+      req.write(postData);
 
-            var postData =  JSON.stringify({
-            'authorization_code': auth_code,
-            'email': email,
-            'amount': amount
-            });
-
-            req.write(postData);
-
-            req.end();
-     })
- }
+      req.end();
+    });
+  }
 }
-  module.exports=new Paystack_class()
+module.exports = new Paystack_class();

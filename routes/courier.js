@@ -1,13 +1,29 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-const verification= require('../verification/verification');
-const courierController=require('../controller/courier')
+const verification = require("../verification/verification");
+const courierController = require("../controller/courier");
 
-router.post('/apply', verification.verifyToken, courierController.applyAsCourier)
-router.get('/get/:id', courierController.getCourierById)
-router.get('/search/:value', verification.verifyToken, courierController.searchCourier)
-router.post('/rate/:id', verification.verifyToken, courierController.rateCourier)
-router.get('/getallstate', courierController.getAllcourierStates)
-router.post('/setavailablestate', verification.verifyToken, courierController.setAvailableState)
+router.post(
+  "/apply",
+  verification.verifyToken,
+  courierController.applyAsCourier
+);
+router.get("/get/:id", courierController.getCourierById);
+router.get(
+  "/search/:value",
+  verification.verifyToken,
+  courierController.searchCourier
+);
+router.post(
+  "/rate/:id",
+  verification.verifyToken,
+  courierController.rateCourier
+);
+router.get("/getallstate", courierController.getAllcourierStates);
+router.post(
+  "/setavailablestate",
+  verification.verifyToken,
+  courierController.setAvailableState
+);
 
 module.exports = router;
