@@ -18,6 +18,8 @@ const historyModel=require('../models/balance_history');
 const notificationModel=require('../models/notification')
 const cardModel=require('../models/card_details')
 const jwt=require('jsonwebtoken')
+const email_regex = /\S+@\S+\.\S+/;
+
 
 class user{
     createAcc(req, res){
@@ -35,6 +37,9 @@ class user{
            }else{
                 hasher.hash_password(data.password).then(hashed=>{
                     data.password=hashed
+                    if(data.phone.length!==11||data.email.match(email_regex)===null){
+                        res.status(203).json({success:false, message:"number must have length of 11 and email must be valid"})
+                    }else{
                         userModel.create(data, (err, newUser)=>{
                             if(err){
                                 if (err.name === 'MongoError' && err.code === 11000) {
@@ -69,7 +74,8 @@ class user{
                                 })
                                }
                         })
-                    })
+                    }        
+                })
                
            }
         }catch(e){
@@ -252,7 +258,11 @@ class user{
                 }
                 var password=req.body.password
                 try{
+
                     auth_user.verifyToken(req.token).then(decoded_user=>{
+                        if(data.email.match(email_regex)===null){
+                            res.status(203).success({success:false, message:"please pass in a valid email"});
+                    }else{
                         hasher.compare_password(password, decoded_user.password).then(value=>{
                            
                             if(value==true){
@@ -269,6 +279,8 @@ class user{
                                 res.status(203).json({success:false, message:"incorrect password"})
                             }
                         })
+                        
+                  }
                     }).catch(err=>{
                         res.status(203).json({success:false, err:err})
                     })
@@ -421,9 +433,13 @@ class user{
                  var token= req.query.token;
                 var data={
                     password:req.body.password,
+                    confirm_password:req.body.confirm_password
                 }
-
-                jwt.verify(token, process.env.JWT_SECRET, (err, decoded_token)=>{
+                try{
+                    if(password!==confirm_password){
+                        res.status(203).send("password and confirm password doesn't match");
+                    }else{
+                        jwt.verify(token, process.env.JWT_SECRET, (err, decoded_token)=>{
                     if(err){
                         res.status(205).json({success:false, message:"token expired"})
                     }else{
@@ -436,7 +452,7 @@ class user{
                             if(err) {
                                 res.status(401).send("error reseting password")
                             }else{
-                                res.status(200).json({success:true, message:"password reset succesful"})
+                                res.render("success");
                             }
 
                         })
@@ -445,6 +461,11 @@ class user{
                     }
                    
                 })
+                    }
+                }catch(e){
+                    console.log(e);
+                    res.status(500);
+                }
             }
 }
 module.exports=new user()

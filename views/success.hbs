@@ -23,19 +23,12 @@
                   <tr>
                     <td class="header-lg">
                      
-
-			        <form action="/user/resetpassword?token={{token}}" method="POST">
+					  <div align="center"><h2 class="text-monospace">Password reset successful</h2></div>
+            <br/>
+            <form action="Gosiso://app.com" target="_blank">
+                <div align="center"><button type="submit" class="btn btn-primary">Open App</button></div>
+            </form>
 					  
-					  <div class="form-group">
-					    <label>Password</label>
-					    <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="type new Password">
-              <br/>
-              <label>Confirm password</label>
-              <input type="password" name="confirm_password" class="form-control" id="exampleInputPassword1" placeholder="confirm Password">
-					  </div>
-					  
-					  <div align="center"><button type="submit" class="btn btn-primary">Submit</button></div>
-					</form>
                     </td>
                   </tr>
                   <tr>
@@ -47,11 +40,15 @@
             </td>
           </tr>
         
-        
-        
           <tr>
             
           </tr>
         </table>
         </body>
+        <script>
+    window.onload = function() {
+    
+        window.location = 'Gosiso://app.com';
+    
+    </script>
         </html>
