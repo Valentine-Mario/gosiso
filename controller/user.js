@@ -407,9 +407,9 @@ class user{
                         let user=Current_user._id
                         WorkQueue.add({email:data.email}, { attempts: 3});
                         auth_user.createTokenResetPassword({user}).then(token=>{
-                        WorkQueue.process( job => {
+                        WorkQueue.process( job2 => {
                         //queue mailing job
-                         mail.forgotPassword(data.email, token).then(email_status=>{
+                         mail.forgotPassword(job2.data.email, token).then(email_status=>{
                             console.log(email_status)
                          });
                         WorkQueue.on('completed', (job, result) => {
