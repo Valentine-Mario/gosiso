@@ -650,7 +650,7 @@ class user {
       confirm_password: req.body.confirm_password,
     };
     try {
-      if (password !== confirm_password) {
+      if (data.password !== data.confirm_password) {
         res.status(203).send("password and confirm password doesn't match");
       } else {
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded_token) => {
