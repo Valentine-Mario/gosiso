@@ -629,7 +629,7 @@ class user {
             });
             res
               .status(200)
-              .json({ success: true, message: "email reset link sent" });
+              .json({ success: true, message: "Please check your email" });
           });
         }
       );

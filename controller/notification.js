@@ -21,7 +21,7 @@ class notification {
   CourierAlert(user) {
     var data = {
       title: `Hello ${user.firstName} Be a courier`,
-      message: `Submit your courier details to be verified as a courier and start earning on our platform`,
+      message: `Submit your courier details in the account section to be verified as a courier and start earning on our platform`,
       user: user._id,
       created_at: Date.now(),
     };
